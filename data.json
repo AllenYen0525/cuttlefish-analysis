@@ -1,1 +1,24 @@
-
+#[
+  {
+    "id": "mean_brightness(B_25092223)_ASpart",
+    "title": "mean_brightness(B_25092223)(0014-0021)",
+    "file": "charts/A_normal_mean_brightness_24081718.png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "24081718"
+    }
+  },
+  {
+    "id": "c2",
+    "title": "個體 B - Speed (Water Flow)",
+    "file": "charts/B_waterflow_speed_24081819.png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "water flow",
+      "Date": "24081819"
+    }
+  }
+]
