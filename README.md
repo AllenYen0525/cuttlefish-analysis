@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>烏賊實驗數據圖表對比與篩選系統</title>
+  <title>實驗數據圖表對比與篩選系統</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { display: flex; flex-direction: column; height: 100vh; background-color: #f4f6f8; color: #333; }
@@ -31,13 +31,37 @@
     .chart-info { margin-top: 10px; font-size: 0.85rem; }
     .tag-badge { display: inline-block; background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin: 2px; }
 
-    /* 全螢幕圖表對比視窗 */
+    /* 全螢幕圖表對比視窗 - 改為縱向 (Vertical) 垂直排列 */
     .compare-section { display: none; width: 100%; height: 100%; position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.85); z-index: 100; padding: 20px; flex-direction: column; }
     .compare-section.active { display: flex; }
-    .compare-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 12px; }
-    .compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; flex: 1; overflow-y: auto; }
-    .compare-item { background: white; padding: 12px; border-radius: 8px; display: flex; flex-direction: column; }
-    .compare-item img { width: 100%; height: auto; max-height: 70vh; object-fit: contain; }
+    .compare-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 16px; }
+    
+    /* 縱向單欄佈局與滾動控制 */
+    .compare-grid { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 24px; 
+      flex: 1; 
+      overflow-y: auto; 
+      padding-right: 8px;
+    }
+    .compare-item { 
+      background: white; 
+      padding: 16px; 
+      border-radius: 8px; 
+      display: flex; 
+      flex-direction: column; 
+      width: 100%; 
+      max-width: 1000px; /* 限制最大寬度，避免在極寬螢幕上失真 */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .compare-item img { 
+      width: 100%; 
+      height: auto; 
+      max-height: 80vh; /* 避免單張圖片過高超出螢幕 */
+      object-fit: contain; 
+    }
   </style>
 </head>
 <body>
@@ -45,7 +69,6 @@
   <header>
     <h1>實驗數據圖表對比與篩選系統</h1>
     <div class="filter-container" id="filterContainer">
-      <!-- 篩選選單由 JavaScript 讀取 data.json 後自動生成 -->
       <div class="action-bar">
         <span id="selectedCount">已選擇 0 張圖表</span>
         <button id="compareBtn" class="btn" disabled onclick="toggleCompareView(true)">開始對比</button>
@@ -59,10 +82,10 @@
     </section>
   </main>
 
-  <!-- 並列對比面板 -->
+  <!-- 縱向對比面板 -->
   <div class="compare-section" id="compareSection">
     <div class="compare-header">
-      <h2>圖表橫向對比視窗</h2>
+      <h2>圖表縱向對比視窗 (由上往下滾動查看)</h2>
       <button class="btn" style="background:#cf222e;" onclick="toggleCompareView(false)">關閉對比</button>
     </div>
     <div class="compare-grid" id="compareGrid"></div>
@@ -73,7 +96,6 @@
     let selectedChartIds = new Set();
     let currentFilters = {};
 
-    // 1. 從伺服器讀取 data.json 檔案
     async function loadData() {
       try {
         const response = await fetch('./data.json');
@@ -90,7 +112,6 @@
       }
     }
 
-    // 2. 自動分析所有標籤，生成下拉篩選選單
     function initFilters() {
       const filterContainer = document.getElementById('filterContainer');
       const actionBar = filterContainer.querySelector('.action-bar');
@@ -126,7 +147,6 @@
       });
     }
 
-    // 3. 根據選取條件過濾並渲染圖表網格
     function renderCharts() {
       const grid = document.getElementById('chartGrid');
       grid.innerHTML = '';
@@ -162,7 +182,6 @@
       });
     }
 
-    // 4. 切換圖表勾選狀態
     function toggleSelectChart(id) {
       if (selectedChartIds.has(id)) {
         selectedChartIds.delete(id);
@@ -174,7 +193,6 @@
       renderCharts();
     }
 
-    // 5. 控制並列對比面板視窗
     function toggleCompareView(show) {
       const compareSection = document.getElementById('compareSection');
       const compareGrid = document.getElementById('compareGrid');
@@ -184,8 +202,15 @@
         chartsData.filter(c => selectedChartIds.has(c.id)).forEach(chart => {
           const item = document.createElement('div');
           item.className = 'compare-item';
+
+          const tagsHtml = chart.tags ? Object.entries(chart.tags)
+            .map(([k, v]) => `<span class="tag-badge"><b>${k}:</b> ${v}</span>`).join('') : '';
+
           item.innerHTML = `
-            <h3 style="margin-bottom:8px;">${chart.title}</h3>
+            <div style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:1.1rem; color:#24292e;">${chart.title}</h3>
+              <div>${tagsHtml}</div>
+            </div>
             <img src="${chart.file}" />
           `;
           compareGrid.appendChild(item);
@@ -196,7 +221,6 @@
       }
     }
 
-    // 頁面載入完成後自動執行
     window.onload = loadData;
   </script>
 </body>
