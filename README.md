@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>實驗圖表篩選與對比系統</title>
+  <title>烏賊實驗數據圖表對比與篩選系統</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { display: flex; flex-direction: column; height: 100vh; background-color: #f4f6f8; color: #333; }
     
-    /* 頂部控制面板 */
+    /* 頂部導覽列與篩選器 */
     header { background: #ffffff; padding: 16px 24px; border-bottom: 1px solid #e1e4e8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     h1 { font-size: 1.25rem; margin-bottom: 12px; color: #24292e; }
     .filter-container { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
@@ -16,15 +16,13 @@
     .filter-group label { font-size: 0.75rem; font-weight: bold; color: #586069; text-transform: uppercase; }
     select { padding: 6px 12px; border: 1px solid #d1d5da; border-radius: 6px; background-color: #fff; font-size: 0.9rem; }
     
-    /* 選擇計數與對比按鈕 */
+    /* 按鈕與操作區 */
     .action-bar { margin-left: auto; display: flex; align-items: center; gap: 12px; }
     .btn { padding: 8px 16px; background-color: #2da44e; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .btn:disabled { background-color: #94d3a2; cursor: not-allowed; }
     
-    /* 主要內容區 */
+    /* 主要內容展示區 */
     main { display: flex; flex: 1; overflow: hidden; }
-    
-    /* 圖表瀏覽區 */
     .gallery-section { flex: 1; padding: 20px; overflow-y: auto; }
     .chart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
     .chart-card { background: white; border: 2px solid #e1e4e8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s; }
@@ -33,7 +31,7 @@
     .chart-info { margin-top: 10px; font-size: 0.85rem; }
     .tag-badge { display: inline-block; background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin: 2px; }
 
-    /* 圖表對比區 (抽屜/彈窗) */
+    /* 全螢幕圖表對比視窗 */
     .compare-section { display: none; width: 100%; height: 100%; position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.85); z-index: 100; padding: 20px; flex-direction: column; }
     .compare-section.active { display: flex; }
     .compare-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 12px; }
@@ -47,7 +45,7 @@
   <header>
     <h1>實驗數據圖表對比與篩選系統</h1>
     <div class="filter-container" id="filterContainer">
-      <!-- 篩選器下拉選單將由 JavaScript 根據資料動態生成 -->
+      <!-- 篩選選單由 JavaScript 讀取 data.json 後自動生成 -->
       <div class="action-bar">
         <span id="selectedCount">已選擇 0 張圖表</span>
         <button id="compareBtn" class="btn" disabled onclick="toggleCompareView(true)">開始對比</button>
@@ -57,11 +55,11 @@
 
   <main>
     <section class="gallery-section">
-      <div class="chart-grid" id="chartGrid"></div>
+      <div class="chart-grid" id="chartGrid">載入資料中...</div>
     </section>
   </main>
 
-  <!-- 圖表並列對比面板 -->
+  <!-- 並列對比面板 -->
   <div class="compare-section" id="compareSection">
     <div class="compare-header">
       <h2>圖表橫向對比視窗</h2>
@@ -71,60 +69,41 @@
   </div>
 
   <script>
-    // 1. 圖表資料庫 (未來只需在此處新增/修改圖表與標籤)
-    const chartsData = [
-      {
-        id: "c1",
-        title: "個體 A - Mean Brightness (Normal)",
-        url: "https://via.placeholder.com/600x400?text=Chart+A+Normal+Brightness",
-        tags: {
-          "Metric (指標)": "mean_brightness",
-          "Subject (個體)": "A",
-          "Condition (條件)": "normal",
-          "Date (日期)": "24081718"
-        }
-      },
-      {
-        id: "c2",
-        title: "個體 A - Brightness Std (Water Flow)",
-        url: "https://via.placeholder.com/600x400?text=Chart+A+WaterFlow+Std",
-        tags: {
-          "Metric (指標)": "brightness_std",
-          "Subject (個體)": "A",
-          "Condition (條件)": "water flow",
-          "Date (日期)": "24081718"
-        }
-      },
-      {
-        id: "c3",
-        title: "個體 B - Speed (Checkerboard Day Time)",
-        url: "https://via.placeholder.com/600x400?text=Chart+B+Speed+Checkerboard",
-        tags: {
-          "Metric (指標)": "speed_px_per_s",
-          "Subject (個體)": "B",
-          "Condition (條件)": "checkerboard day time",
-          "Date (日期)": "24081819"
-        }
-      }
-    ];
-
+    let chartsData = [];
     let selectedChartIds = new Set();
     let currentFilters = {};
 
-    // 2. 初始化：自動根據資料中的所有標籤鍵值建立篩選器
+    // 1. 從伺服器讀取 data.json 檔案
+    async function loadData() {
+      try {
+        const response = await fetch('./data.json');
+        if (!response.ok) throw new Error('讀取 data.json 失敗');
+        chartsData = await response.json();
+        initFilters();
+        renderCharts();
+      } catch (error) {
+        document.getElementById('chartGrid').innerHTML = `
+          <div style="color: #cf222e; padding: 20px;">
+            <h3>資料載入失敗！</h3>
+            <p>請確認儲存庫根目錄下是否有建立 <b>data.json</b> 且格式正確。</p>
+          </div>`;
+      }
+    }
+
+    // 2. 自動分析所有標籤，生成下拉篩選選單
     function initFilters() {
       const filterContainer = document.getElementById('filterContainer');
       const actionBar = filterContainer.querySelector('.action-bar');
       
-      // 收集資料中所有的 tag 種類（例如 Metric, Subject, Condition...）
       const tagCategories = new Set();
       chartsData.forEach(chart => {
-        Object.keys(chart.tags).forEach(cat => tagCategories.add(cat));
+        if (chart.tags) {
+          Object.keys(chart.tags).forEach(cat => tagCategories.add(cat));
+        }
       });
 
       tagCategories.forEach(category => {
-        // 收集該種類下所有出現過的值
-        const options = new Set(chartsData.map(c => c.tags[category]).filter(Boolean));
+        const options = new Set(chartsData.map(c => c.tags ? c.tags[category] : null).filter(Boolean));
 
         const groupDiv = document.createElement('div');
         groupDiv.className = 'filter-group';
@@ -133,7 +112,7 @@
         label.innerText = category;
         
         const select = document.createElement('select');
-        select.innerHTML = `<option value="">全部 (All)</option>` + 
+        select.innerHTML = `<option value="">全部 (${category})</option>` + 
           Array.from(options).map(opt => `<option value="${opt}">${opt}</option>`).join('');
         
         select.addEventListener('change', (e) => {
@@ -147,16 +126,21 @@
       });
     }
 
-    // 3. 根據篩選條件渲染圖表列表
+    // 3. 根據選取條件過濾並渲染圖表網格
     function renderCharts() {
       const grid = document.getElementById('chartGrid');
       grid.innerHTML = '';
 
       const filteredCharts = chartsData.filter(chart => {
         return Object.keys(currentFilters).every(cat => {
-          return !currentFilters[cat] || chart.tags[cat] === currentFilters[cat];
+          return !currentFilters[cat] || (chart.tags && chart.tags[cat] === currentFilters[cat]);
         });
       });
+
+      if (filteredCharts.length === 0) {
+        grid.innerHTML = '<p style="padding: 20px; color: #6e7681;">沒有符合條件的圖表。</p>';
+        return;
+      }
 
       filteredCharts.forEach(chart => {
         const isSelected = selectedChartIds.has(chart.id);
@@ -164,11 +148,11 @@
         card.className = `chart-card ${isSelected ? 'selected' : ''}`;
         card.onclick = () => toggleSelectChart(chart.id);
 
-        const tagsHtml = Object.entries(chart.tags)
-          .map(([k, v]) => `<span class="tag-badge">${v}</span>`).join('');
+        const tagsHtml = chart.tags ? Object.entries(chart.tags)
+          .map(([k, v]) => `<span class="tag-badge"><b>${k}:</b> ${v}</span>`).join('') : '';
 
         card.innerHTML = `
-          <img src="${chart.url}" alt="${chart.title}">
+          <img src="${chart.file}" alt="${chart.title}" onerror="this.src='https://via.placeholder.com/300x200?text=圖片路徑錯誤'">
           <div class="chart-info">
             <strong>${chart.title}</strong>
             <div style="margin-top:6px;">${tagsHtml}</div>
@@ -178,39 +162,31 @@
       });
     }
 
-    // 4. 切換圖表選取狀態
+    // 4. 切換圖表勾選狀態
     function toggleSelectChart(id) {
       if (selectedChartIds.has(id)) {
         selectedChartIds.delete(id);
       } else {
         selectedChartIds.add(id);
       }
-      updateActionBar();
+      document.getElementById('selectedCount').innerText = `已選擇 ${selectedChartIds.size} 張圖表`;
+      document.getElementById('compareBtn').disabled = selectedChartIds.size < 2;
       renderCharts();
     }
 
-    // 5. 更新選取計數與對比按鈕狀態
-    function updateActionBar() {
-      const countSpan = document.getElementById('selectedCount');
-      const compareBtn = document.getElementById('compareBtn');
-      countSpan.innerText = `已選擇 ${selectedChartIds.size} 張圖表`;
-      compareBtn.disabled = selectedChartIds.size < 2;
-    }
-
-    // 6. 控制對比視窗開關與渲染並列圖表
+    // 5. 控制並列對比面板視窗
     function toggleCompareView(show) {
       const compareSection = document.getElementById('compareSection');
       const compareGrid = document.getElementById('compareGrid');
       
       if (show) {
         compareGrid.innerHTML = '';
-        const selectedCharts = chartsData.filter(c => selectedChartIds.has(c.id));
-        selectedCharts.forEach(chart => {
+        chartsData.filter(c => selectedChartIds.has(c.id)).forEach(chart => {
           const item = document.createElement('div');
           item.className = 'compare-item';
           item.innerHTML = `
-            <h3>${chart.title}</h3>
-            <img src="${chart.url}" />
+            <h3 style="margin-bottom:8px;">${chart.title}</h3>
+            <img src="${chart.file}" />
           `;
           compareGrid.appendChild(item);
         });
@@ -220,9 +196,8 @@
       }
     }
 
-    // 啟動頁面
-    initFilters();
-    renderCharts();
+    // 頁面載入完成後自動執行
+    window.onload = loadData;
   </script>
 </body>
-</html># cuttlefish-analysis
+</html>
