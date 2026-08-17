@@ -2,12 +2,12 @@
   {
     "id": "mean_brightness(B_25092223)_ASpart",
     "title": "mean_brightness(B_25092223)(0014-0021)",
-    "file": "charts/A_normal_mean_brightness_24081718.png",
+    "file": "charts/mean_brightness(B_25092223)(0014-0021).png",
     "tags": {
       "Metric": "mean_brightness",
-      "Subject": "A",
+      "Subject": "B",
       "Condition": "normal",
-      "Date": "24081718"
+      "Date": "25092223"
     }
   },
   {
