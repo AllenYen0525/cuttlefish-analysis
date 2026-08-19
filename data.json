@@ -94,5 +94,677 @@
       "Date": "25092223",
       "part": "local"
     }
+  },
+  {
+    "id": "fullday_brightness_diff(B_25092526)",
+    "title": "fullday_brightness_diff(B_25092526)",
+    "file": "charts/fullday_brightness_diff(B_25092526).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092526",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_brightness_std(B_25092526)",
+    "title": "fullday_brightness_std(B_25092526)",
+    "file": "charts/fullday_brightness_std(B_25092526).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092526",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_mean_brightness(B_25092526)",
+    "title": "fullday_mean_brightness(B_25092526)",
+    "file": "charts/fullday_mean_brightness(B_25092526).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092526",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_speed_px_per_s(B_25092526)",
+    "title": "fullday_speed_px_per_s(B_25092526)",
+    "file": "charts/fullday_speed_px_per_s(B_25092526).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092526",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "local_brightness_diff(B_25092526)",
+    "title": "local_brightness_diff(B_25092526)",
+    "file": "charts/local_brightness_diff(B_25092526).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092526",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_brightness_std(B_25092526)",
+    "title": "local_brightness_std(B_25092526)",
+    "file": "charts/local_brightness_std(B_25092526).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092526",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_mean_brightness(B_25092526)",
+    "title": "local_mean_brightness(B_25092526)",
+    "file": "charts/local_mean_brightness(B_25092526).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092526",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_speed_px_per_s(B_25092526)",
+    "title": "local_speed_px_per_s(B_25092526)",
+    "file": "charts/local_speed_px_per_s(B_25092526).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092526",
+      "part": "local"
+    }
+  },
+  {
+    "id": "fullday_brightness_diff(B_25092930)",
+    "title": "fullday_brightness_diff(B_25092930)",
+    "file": "charts/fullday_brightness_diff(B_25092930).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092930",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_brightness_std(B_25092930)",
+    "title": "fullday_brightness_std(B_25092930)",
+    "file": "charts/fullday_brightness_std(B_25092930).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092930",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_mean_brightness(B_25092930)",
+    "title": "fullday_mean_brightness(B_25092930)",
+    "file": "charts/fullday_mean_brightness(B_25092930).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092930",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_speed_px_per_s(B_25092930)",
+    "title": "fullday_speed_px_per_s(B_25092930)",
+    "file": "charts/fullday_speed_px_per_s(B_25092930).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092930",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "local_brightness_diff(B_25092930)",
+    "title": "local_brightness_diff(B_25092930)",
+    "file": "charts/local_brightness_diff(B_25092930).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092930",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_brightness_std(B_25092930)",
+    "title": "local_brightness_std(B_25092930)",
+    "file": "charts/local_brightness_std(B_25092930).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092930",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_mean_brightness(B_25092930)",
+    "title": "local_mean_brightness(B_25092930)",
+    "file": "charts/local_mean_brightness(B_25092930).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092930",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_speed_px_per_s(B_25092930)",
+    "title": "local_speed_px_per_s(B_25092930)",
+    "file": "charts/local_speed_px_per_s(B_25092930).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25092930",
+      "part": "local"
+    }
+  },
+  {
+    "id": "fullday_brightness_diff(B_25110506)",
+    "title": "fullday_brightness_diff(B_25110506)",
+    "file": "charts/fullday_brightness_diff(B_25110506).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25110506",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_brightness_std(B_25110506)",
+    "title": "fullday_brightness_std(B_25110506)",
+    "file": "charts/fullday_brightness_std(B_25110506).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25110506",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_mean_brightness(B_25110506)",
+    "title": "fullday_mean_brightness(B_25110506)",
+    "file": "charts/fullday_mean_brightness(B_25110506).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25110506",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_speed_px_per_s(B_25110506)",
+    "title": "fullday_speed_px_per_s(B_25110506)",
+    "file": "charts/fullday_speed_px_per_s(B_25110506).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25110506",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "local_brightness_diff(B_25110506)",
+    "title": "local_brightness_diff(B_25110506)",
+    "file": "charts/local_brightness_diff(B_25110506).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25110506",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_brightness_std(B_25110506)",
+    "title": "local_brightness_std(B_25110506)",
+    "file": "charts/local_brightness_std(B_25110506).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25110506",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_mean_brightness(B_25110506)",
+    "title": "local_mean_brightness(B_25110506)",
+    "file": "charts/local_mean_brightness(B_25110506).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25110506",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_speed_px_per_s(B_25110506)",
+    "title": "local_speed_px_per_s(B_25110506)",
+    "file": "charts/local_speed_px_per_s(B_25110506).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25110506",
+      "part": "local"
+    }
+  },
+  {
+    "id": "fullday_brightness_diff(B_25122223)",
+    "title": "fullday_brightness_diff(B_25122223)",
+    "file": "charts/fullday_brightness_diff(B_25122223).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122223",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_brightness_std(B_25122223)",
+    "title": "fullday_brightness_std(B_25122223)",
+    "file": "charts/fullday_brightness_std(B_25122223).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122223",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_mean_brightness(B_25122223)",
+    "title": "fullday_mean_brightness(B_25122223)",
+    "file": "charts/fullday_mean_brightness(B_25122223).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122223",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_speed_px_per_s(B_25122223)",
+    "title": "fullday_speed_px_per_s(B_25122223)",
+    "file": "charts/fullday_speed_px_per_s(B_25122223).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122223",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "local_brightness_diff(B_25122223)",
+    "title": "local_brightness_diff(B_25122223)",
+    "file": "charts/local_brightness_diff(B_25122223).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122223",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_brightness_std(B_25122223)",
+    "title": "local_brightness_std(B_25122223)",
+    "file": "charts/local_brightness_std(B_25122223).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122223",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_mean_brightness(B_25122223)",
+    "title": "local_mean_brightness(B_25122223)",
+    "file": "charts/local_mean_brightness(B_25122223).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122223",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_speed_px_per_s(B_25122223)",
+    "title": "local_speed_px_per_s(B_25122223)",
+    "file": "charts/local_speed_px_per_s(B_25122223).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122223",
+      "part": "local"
+    }
+  },
+  {
+    "id": "fullday_brightness_diff(B_25122829)",
+    "title": "fullday_brightness_diff(B_25122829)",
+    "file": "charts/fullday_brightness_diff(B_25122829).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122829",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_brightness_std(B_25122829)",
+    "title": "fullday_brightness_std(B_25122829)",
+    "file": "charts/fullday_brightness_std(B_25122829).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122829",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_mean_brightness(B_25122829)",
+    "title": "fullday_mean_brightness(B_25122829)",
+    "file": "charts/fullday_mean_brightness(B_25122829).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122829",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_speed_px_per_s(B_25122829)",
+    "title": "fullday_speed_px_per_s(B_25122829)",
+    "file": "charts/fullday_speed_px_per_s(B_25122829).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122829",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "local_brightness_diff(B_25122829)",
+    "title": "local_brightness_diff(B_25122829)",
+    "file": "charts/local_brightness_diff(B_25122829).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122829",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_brightness_std(B_25122829)",
+    "title": "local_brightness_std(B_25122829)",
+    "file": "charts/local_brightness_std(B_25122829).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122829",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_mean_brightness(B_25122829)",
+    "title": "local_mean_brightness(B_25122829)",
+    "file": "charts/local_mean_brightness(B_25122829).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122829",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_speed_px_per_s(B_25122829)",
+    "title": "local_speed_px_per_s(B_25122829)",
+    "file": "charts/local_speed_px_per_s(B_25122829).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "25122829",
+      "part": "local"
+    }
+  },
+  {
+    "id": "fullday_brightness_diff(B_26010607)",
+    "title": "fullday_brightness_diff(B_26010607)",
+    "file": "charts/fullday_brightness_diff(B_26010607).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26010607",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_brightness_std(B_26010607)",
+    "title": "fullday_brightness_std(B_26010607)",
+    "file": "charts/fullday_brightness_std(B_26010607).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26010607",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_mean_brightness(B_26010607)",
+    "title": "fullday_mean_brightness(B_26010607)",
+    "file": "charts/fullday_mean_brightness(B_26010607).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26010607",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_speed_px_per_s(B_26010607)",
+    "title": "fullday_speed_px_per_s(B_26010607)",
+    "file": "charts/fullday_speed_px_per_s(B_26010607).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26010607",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "local_brightness_diff(B_26010607)",
+    "title": "local_brightness_diff(B_26010607)",
+    "file": "charts/local_brightness_diff(B_26010607).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26010607",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_brightness_std(B_26010607)",
+    "title": "local_brightness_std(B_26010607)",
+    "file": "charts/local_brightness_std(B_26010607).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26010607",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_mean_brightness(B_26010607)",
+    "title": "local_mean_brightness(B_26010607)",
+    "file": "charts/local_mean_brightness(B_26010607).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26010607",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_speed_px_per_s(B_26010607)",
+    "title": "local_speed_px_per_s(B_26010607)",
+    "file": "charts/local_speed_px_per_s(B_26010607).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26010607",
+      "part": "local"
+    }
+  },
+  {
+    "id": "fullday_brightness_diff(B_26011213)",
+    "title": "fullday_brightness_diff(B_26011213)",
+    "file": "charts/fullday_brightness_diff(B_26011213).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26011213",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_brightness_std(B_26011213)",
+    "title": "fullday_brightness_std(B_26011213)",
+    "file": "charts/fullday_brightness_std(B_26011213).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26011213",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_mean_brightness(B_26011213)",
+    "title": "fullday_mean_brightness(B_26011213)",
+    "file": "charts/fullday_mean_brightness(B_26011213).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26011213",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "fullday_speed_px_per_s(B_26011213)",
+    "title": "fullday_speed_px_per_s(B_26011213)",
+    "file": "charts/fullday_speed_px_per_s(B_26011213).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26011213",
+      "part": "fullday"
+    }
+  },
+  {
+    "id": "local_brightness_diff(B_26011213)",
+    "title": "local_brightness_diff(B_26011213)",
+    "file": "charts/local_brightness_diff(B_26011213).png",
+    "tags": {
+      "Metric": "brightness_diff",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26011213",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_brightness_std(B_26011213)",
+    "title": "local_brightness_std(B_26011213)",
+    "file": "charts/local_brightness_std(B_26011213).png",
+    "tags": {
+      "Metric": "brightness_std",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26011213",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_mean_brightness(B_26011213)",
+    "title": "local_mean_brightness(B_26011213)",
+    "file": "charts/local_mean_brightness(B_26011213).png",
+    "tags": {
+      "Metric": "mean_brightness",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26011213",
+      "part": "local"
+    }
+  },
+  {
+    "id": "local_speed_px_per_s(B_26011213)",
+    "title": "local_speed_px_per_s(B_26011213)",
+    "file": "charts/local_speed_px_per_s(B_26011213).png",
+    "tags": {
+      "Metric": "speed_px_per_s",
+      "Subject": "B",
+      "Condition": "normal",
+      "Date": "26011213",
+      "part": "local"
+    }
   }
 ]
