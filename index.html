@@ -1,1 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>圖表分析儀表板</title>
+  <style>
+    /* 全域設定 */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f6f8fa; color: #24292e; display: flex; flex-direction: column; min-height: 100vh; }
 
+    /* 頂部導覽列與篩選器 */
+    header { background: #ffffff; padding: 16px 24px; border-bottom: 1px solid #e1e4e8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.25rem; margin-bottom: 12px; color: #24292e; }
+    .filter-container { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-group label { font-size: 0.75rem; font-weight: bold; color: #586069; text-transform: uppercase; }
+    select { padding: 6px 12px; border: 1px solid #d1d5da; border-radius: 6px; background-color: #fff; font-size: 0.9rem; outline: none; }
+    select:focus { border-color: #0969da; }
+
+    /* 按鈕與操作區 */
+    .action-bar { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .btn { padding: 8px 16px; background-color: #2da44e; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background-color: #2c974b; }
+    .btn:disabled { background-color: #94d3a2; cursor: not-allowed; }
+
+    /* 主要內容展示區 */
+    main { display: flex; flex: 1; overflow: hidden; }
+    .gallery-section { flex: 1; padding: 20px; overflow-y: auto; }
+    .chart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .chart-card { background: white; border: 2px solid #e1e4e8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s; position: relative; }
+    .chart-card:hover { border-color: #0969da; }
+    .chart-card.selected { border-color: #0969da; background-color: #f0f7ff; }
+    .chart-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 4px; background: #eee; }
+    .chart-info { margin-top: 10px; font-size: 0.85rem; }
+    .chart-title { font-weight: bold; margin-bottom: 6px; word-break: break-all; }
+    .tag-badge { display: inline-block; background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin: 2px 2px 2px 0; }
+
+    /* 全螢幕圖表對比視窗 - 縱向 (Vertical) 垂直排列 */
+    .compare-section { display: none; width: 100%; height: 100%; position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.85); z-index: 100; padding: 20px; flex-direction: column; }
+    .compare-section.active { display: flex; }
+    .compare-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 16px; }
+    .close-btn { background: #cf222e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    /* 縱向單欄佈局與滾動控制 */
+    .compare-grid { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 24px; 
+      flex: 1; 
+      overflow-y: auto; 
+      padding-right: 8px;
+    }
+    .compare-item { 
+      background: white; 
+      padding: 16px; 
+      border-radius: 8px; 
+      display: flex; 
+      flex-direction: column; 
+      width: 100%; 
+      max-width: 1000px; /* 限制最大寬度，避免在極寬螢幕上失真 */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .compare-item h3 { margin-bottom: 8px; font-size: 1rem; color: #333; }
+    .compare-item img { 
+      width: 100%; 
+      height: auto; 
+      max-height: 80vh; /* 避免單張圖片過高超出螢幕 */
+      object-fit: contain; 
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部導覽列與篩選區 -->
+  <header>
+    <h1>圖表分析儀表板</h1>
+    <div class="filter-container">
+      <div class="filter-group">
+        <label>Part</label>
+        <select id="filter-part"><option value="ALL">全部 (ALL)</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Metric</label>
+        <select id="filter-metric"><option value="ALL">全部 (ALL)</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Subject</label>
+        <select id="filter-subject"><option value="ALL">全部 (ALL)</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Condition</label>
+        <select id="filter-condition"><option value="ALL">全部 (ALL)</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Date</label>
+        <select id="filter-date"><option value="ALL">全部 (ALL)</option></select>
+      </div>
+
+      <div class="action-bar">
+        <button id="compare-btn" class="btn" disabled>對比選取圖表 (0)</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 圖表展示區 -->
+  <main>
+    <section class="gallery-section">
+      <div id="chart-grid" class="chart-grid"></div>
+    </section>
+  </main>
+
+  <!-- 全螢幕圖表對比視窗 -->
+  <div id="compare-section" class="compare-section">
+    <div class="compare-header">
+      <h2>圖表對比 (垂直視窗)</h2>
+      <button id="close-compare-btn" class="close-btn">關閉對比</button>
+    </div>
+    <div id="compare-grid" class="compare-grid"></div>
+  </div>
+
+  <script>
+    let rawData = [];
+    const selectedIds = new Set();
+
+    // DOM 元素
+    const chartGrid = document.getElementById('chart-grid');
+    const compareBtn = document.getElementById('compare-btn');
+    const compareSection = document.getElementById('compare-section');
+    const compareGrid = document.getElementById('compare-grid');
+    const closeCompareBtn = document.getElementById('close-compare-btn');
+
+    const filters = {
+      part: document.getElementById('filter-part'),
+      Metric: document.getElementById('filter-metric'),
+      Subject: document.getElementById('filter-subject'),
+      Condition: document.getElementById('filter-condition'),
+      Date: document.getElementById('filter-date')
+    };
+
+    // 初始化讀取 data.json
+    async function init() {
+      try {
+        const response = await fetch('data.json');
+        rawData = await response.json();
+        populateFilterOptions();
+        renderGallery();
+      } catch (err) {
+        console.error('無法載入 data.json:', err);
+        chartGrid.innerHTML = '<p style="color:red;">載入 data.json 失敗，請確認檔案路徑是否正確。</p>';
+      }
+    }
+
+    // 動態生成選單選項
+    function populateFilterOptions() {
+      const keys = ['part', 'Metric', 'Subject', 'Condition', 'Date'];
+      keys.forEach(key => {
+        const options = new Set();
+        rawData.forEach(item => {
+          if (item.tags && item.tags[key]) {
+            options.add(item.tags[key]);
+          }
+        });
+        options.forEach(val => {
+          const opt = document.createElement('option');
+          opt.value = val;
+          opt.textContent = val;
+          filters[key].appendChild(opt);
+        });
+        filters[key].addEventListener('change', renderGallery);
+      });
+    }
+
+    // 渲染圖表清單
+    function renderGallery() {
+      chartGrid.innerHTML = '';
+
+      const filteredData = rawData.filter(item => {
+        return Object.keys(filters).every(key => {
+          const val = filters[key].value;
+          return val === 'ALL' || (item.tags && item.tags[key] === val);
+        });
+      });
+
+      filteredData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `chart-card ${selectedIds.has(item.id) ? 'selected' : ''}`;
+        card.onclick = () => toggleSelect(item.id, card);
+
+        const img = document.createElement('img');
+        img.src = item.file;
+        img.alt = item.title;
+        img.loading = 'lazy';
+
+        const info = document.createElement('div');
+        info.className = 'chart-info';
+
+        const title = document.createElement('div');
+        title.className = 'chart-title';
+        title.textContent = item.title;
+
+        info.appendChild(title);
+
+        if (item.tags) {
+          Object.entries(item.tags).forEach(([k, v]) => {
+            const tag = document.createElement('span');
+            tag.className = 'tag-badge';
+            tag.textContent = `${k}: ${v}`;
+            info.appendChild(tag);
+          });
+        }
+
+        card.appendChild(img);
+        card.appendChild(info);
+        chartGrid.appendChild(card);
+      });
+    }
+
+    // 切換選取狀態
+    function toggleSelect(id, cardElement) {
+      if (selectedIds.has(id)) {
+        selectedIds.delete(id);
+        cardElement.classList.remove('selected');
+      } else {
+        selectedIds.add(id);
+        cardElement.classList.add('selected');
+      }
+
+      compareBtn.textContent = `對比選取圖表 (${selectedIds.size})`;
+      compareBtn.disabled = selectedIds.size === 0;
+    }
+
+    // 開啟對比視窗
+    compareBtn.onclick = () => {
+      compareGrid.innerHTML = '';
+      const selectedItems = rawData.filter(item => selectedIds.has(item.id));
+
+      selectedItems.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'compare-item';
+
+        const title = document.createElement('h3');
+        title.textContent = item.title;
+
+        const img = document.createElement('img');
+        img.src = item.file;
+        img.alt = item.title;
+
+        div.appendChild(title);
+        div.appendChild(img);
+        compareGrid.appendChild(div);
+      });
+
+      compareSection.classList.add('active');
+    };
+
+    // 關閉對比視窗
+    closeCompareBtn.onclick = () => {
+      compareSection.classList.remove('active');
+    };
+
+    init();
+  </script>
+</body>
+</html>
