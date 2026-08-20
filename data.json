@@ -95,7 +95,7 @@
       "Date": "25082526"
     }
   },
-  [
+
   {
     "id": "local_brightness_diff(A_25090607_water_flow)",
     "title": "local_brightness_diff(A_25090607_water_flow)",
@@ -192,7 +192,6 @@
       "Date": "25090607"
     }
   }
-]
   {
     "id": "local_brightness_diff(A_25091213_normal)",
     "title": "local_brightness_diff(A_25091213_normal)",
