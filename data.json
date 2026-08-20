@@ -96,6 +96,102 @@
     }
   },
   {
+    "id": "local_25090607_water_flow_brightness_diff",
+    "file": "local_brightness_diff(A_25090607_water_flow).png",
+    "title": "local_brightness_diff(A_25090607_water_flow)",
+    "tags": {
+      "part": "local",
+      "Metric": "brightness_diff",
+      "Subject": "A",
+      "Condition": "water_flow",
+      "Date": "25090607"
+    }
+  },
+  {
+    "id": "local_25090607_water_flow_brightness_std",
+    "file": "local_brightness_std(A_25090607_water_flow).png",
+    "title": "local_brightness_std(A_25090607_water_flow)",
+    "tags": {
+      "part": "local",
+      "Metric": "brightness_std",
+      "Subject": "A",
+      "Condition": "water_flow",
+      "Date": "25090607"
+    }
+  },
+  {
+    "id": "local_25090607_water_flow_mean_brightness",
+    "file": "local_mean_brightness(A_25090607_water_flow).png",
+    "title": "local_mean_brightness(A_25090607_water_flow)",
+    "tags": {
+      "part": "local",
+      "Metric": "mean_brightness",
+      "Subject": "A",
+      "Condition": "water_flow",
+      "Date": "25090607"
+    }
+  },
+  {
+    "id": "local_25090607_water_flow_speed_px_per_s",
+    "file": "local_speed_px_per_s(A_25090607_water_flow).png",
+    "title": "local_speed_px_per_s(A_25090607_water_flow)",
+    "tags": {
+      "part": "local",
+      "Metric": "speed_px_per_s",
+      "Subject": "A",
+      "Condition": "water_flow",
+      "Date": "25090607"
+    }
+  },
+  {
+    "id": "nighttime_25090607_water_flow_brightness_diff",
+    "file": "nighttime_brightness_diff(A_25090607_water_flow).png",
+    "title": "nighttime_brightness_diff(A_25090607_water_flow)",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "brightness_diff",
+      "Subject": "A",
+      "Condition": "water_flow",
+      "Date": "25090607"
+    }
+  },
+  {
+    "id": "nighttime_25090607_water_flow_brightness_std",
+    "file": "nighttime_brightness_std(A_25090607_water_flow).png",
+    "title": "nighttime_brightness_std(A_25090607_water_flow)",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "brightness_std",
+      "Subject": "A",
+      "Condition": "water_flow",
+      "Date": "25090607"
+    }
+  },
+  {
+    "id": "nighttime_25090607_water_flow_mean_brightness",
+    "file": "nighttime_mean_brightness(A_25090607_water_flow).png",
+    "title": "nighttime_mean_brightness(A_25090607_water_flow)",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "mean_brightness",
+      "Subject": "A",
+      "Condition": "water_flow",
+      "Date": "25090607"
+    }
+  },
+  {
+    "id": "nighttime_25090607_water_flow_speed_px_per_s",
+    "file": "nighttime_speed_px_per_s(A_25090607_water_flow).png",
+    "title": "nighttime_speed_px_per_s(A_25090607_water_flow)",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "speed_px_per_s",
+      "Subject": "A",
+      "Condition": "water_flow",
+      "Date": "25090607"
+    }
+  },
+  {
     "id": "local_brightness_diff(A_25091213_normal)",
     "title": "local_brightness_diff(A_25091213_normal)",
     "file": "charts/local_brightness_diff(A_25091213_normal).png",
