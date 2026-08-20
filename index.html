@@ -23,6 +23,10 @@
     .btn { padding: 8px 16px; background-color: #2da44e; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
     .btn:hover { background-color: #2c974b; }
     .btn:disabled { background-color: #94d3a2; cursor: not-allowed; }
+    
+    .btn-secondary { background-color: #0969da; }
+    .btn-secondary:hover { background-color: #0858b9; }
+    .btn-sm { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; }
 
     /* 主要內容展示區 */
     main { display: flex; flex: 1; overflow: hidden; }
@@ -31,10 +35,11 @@
     .chart-card { background: white; border: 2px solid #e1e4e8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s; position: relative; }
     .chart-card:hover { border-color: #0969da; }
     .chart-card.selected { border-color: #0969da; background-color: #f0f7ff; }
-    .chart-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 4px; background: #eee; }
-    .chart-info { margin-top: 10px; font-size: 0.85rem; }
+    .chart-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 4px; background: #eee; cursor: zoom-in; }
+    .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; }
     .chart-title { font-weight: bold; margin-bottom: 6px; word-break: break-all; }
     .tag-badge { display: inline-block; background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin: 2px 2px 2px 0; }
+    .card-actions { margin-top: 10px; display: flex; justify-content: flex-end; }
 
     /* 全螢幕圖表對比視窗 - 縱向 (Vertical) 垂直排列 */
     .compare-section { display: none; width: 100%; height: 100%; position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.85); z-index: 100; padding: 20px; flex-direction: column; }
@@ -59,15 +64,67 @@
       display: flex; 
       flex-direction: column; 
       width: 100%; 
-      max-width: 1000px; /* 限制最大寬度，避免在極寬螢幕上失真 */
+      max-width: 1000px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    .compare-item h3 { margin-bottom: 8px; font-size: 1rem; color: #333; }
+    .compare-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .compare-item h3 { font-size: 1rem; color: #333; }
     .compare-item img { 
       width: 100%; 
       height: auto; 
-      max-height: 80vh; /* 避免單張圖片過高超出螢幕 */
+      max-height: 80vh; 
       object-fit: contain; 
+      cursor: zoom-in;
+    }
+
+    /* 圖片放大檢視 Modal (Zoom Lightbox) */
+    .zoom-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 200;
+      flex-direction: column;
+    }
+    .zoom-modal.active { display: flex; }
+    .zoom-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+    }
+    .zoom-controls { display: flex; gap: 8px; align-items: center; }
+    .zoom-btn {
+      background: #333;
+      color: white;
+      border: 1px solid #666;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .zoom-btn:hover { background: #555; }
+    .zoom-viewport {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      cursor: grab;
+    }
+    .zoom-viewport:active { cursor: grabbing; }
+    .zoom-viewport img {
+      max-width: 90%;
+      max-height: 90%;
+      transition: transform 0.05s linear;
+      transform-origin: center center;
+      user-select: none;
     }
   </style>
 </head>
@@ -120,6 +177,24 @@
     <div id="compare-grid" class="compare-grid"></div>
   </div>
 
+  <!-- 圖片放大縮小 Modal -->
+  <div id="zoom-modal" class="zoom-modal">
+    <div class="zoom-toolbar">
+      <span id="zoom-title">圖表預覽</span>
+      <div class="zoom-controls">
+        <button id="zoom-out-btn" class="zoom-btn">－ 縮小</button>
+        <span id="zoom-level">100%</span>
+        <button id="zoom-in-btn" class="zoom-btn">＋ 放大</button>
+        <button id="zoom-reset-btn" class="zoom-btn">重設</button>
+        <button id="zoom-download-btn" class="btn btn-secondary btn-sm">下載原圖</button>
+        <button id="close-zoom-btn" class="close-btn" style="margin-left: 12px;">✕ 關閉</button>
+      </div>
+    </div>
+    <div id="zoom-viewport" class="zoom-viewport">
+      <img id="zoom-img" src="" alt="Zoomed Chart" />
+    </div>
+  </div>
+
   <script>
     let rawData = [];
     const selectedIds = new Set();
@@ -131,6 +206,27 @@
     const compareGrid = document.getElementById('compare-grid');
     const closeCompareBtn = document.getElementById('close-compare-btn');
 
+    // Zoom Modal 元素
+    const zoomModal = document.getElementById('zoom-modal');
+    const zoomImg = document.getElementById('zoom-img');
+    const zoomTitle = document.getElementById('zoom-title');
+    const zoomLevelText = document.getElementById('zoom-level');
+    const zoomViewport = document.getElementById('zoom-viewport');
+    const closeZoomBtn = document.getElementById('close-zoom-btn');
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    const zoomResetBtn = document.getElementById('zoom-reset-btn');
+    const zoomDownloadBtn = document.getElementById('zoom-download-btn');
+
+    // Zoom & Drag 狀態管理
+    let currentScale = 1;
+    let translateX = 0;
+    let translateY = 0;
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let currentImageSrc = '';
+    let currentImageTitle = '';
+
     const filters = {
       part: document.getElementById('filter-part'),
       Metric: document.getElementById('filter-metric'),
@@ -138,6 +234,16 @@
       Condition: document.getElementById('filter-condition'),
       Date: document.getElementById('filter-date')
     };
+
+    // 下載圖片通用函式
+    function downloadImage(url, title) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${title || 'chart'}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
 
     // 初始化讀取 data.json
     async function init() {
@@ -186,12 +292,21 @@
       filteredData.forEach(item => {
         const card = document.createElement('div');
         card.className = `chart-card ${selectedIds.has(item.id) ? 'selected' : ''}`;
-        card.onclick = () => toggleSelect(item.id, card);
+        
+        // 點擊卡片空白或內文切換選取狀態
+        card.onclick = (e) => {
+          toggleSelect(item.id, card);
+        };
 
         const img = document.createElement('img');
         img.src = item.file;
         img.alt = item.title;
         img.loading = 'lazy';
+        // 點擊圖片本體開啟放大 Lightbox，不觸發卡片勾選
+        img.onclick = (e) => {
+          e.stopPropagation();
+          openZoomModal(item.file, item.title);
+        };
 
         const info = document.createElement('div');
         info.className = 'chart-info';
@@ -211,8 +326,21 @@
           });
         }
 
+        // 下載按鈕
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+        const dlBtn = document.createElement('button');
+        dlBtn.className = 'btn btn-secondary btn-sm';
+        dlBtn.textContent = '下載圖片';
+        dlBtn.onclick = (e) => {
+          e.stopPropagation();
+          downloadImage(item.file, item.title);
+        };
+        actions.appendChild(dlBtn);
+
         card.appendChild(img);
         card.appendChild(info);
+        card.appendChild(actions);
         chartGrid.appendChild(card);
       });
     }
@@ -240,14 +368,26 @@
         const div = document.createElement('div');
         div.className = 'compare-item';
 
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'compare-item-header';
+
         const title = document.createElement('h3');
         title.textContent = item.title;
+
+        const dlBtn = document.createElement('button');
+        dlBtn.className = 'btn btn-secondary btn-sm';
+        dlBtn.textContent = '下載圖表';
+        dlBtn.onclick = () => downloadImage(item.file, item.title);
+
+        headerDiv.appendChild(title);
+        headerDiv.appendChild(dlBtn);
 
         const img = document.createElement('img');
         img.src = item.file;
         img.alt = item.title;
+        img.onclick = () => openZoomModal(item.file, item.title);
 
-        div.appendChild(title);
+        div.appendChild(headerDiv);
         div.appendChild(img);
         compareGrid.appendChild(div);
       });
@@ -259,6 +399,81 @@
     closeCompareBtn.onclick = () => {
       compareSection.classList.remove('active');
     };
+
+    // --- 圖片放大/縮小/拖曳 (Zoom/Pan Modal) 控制邏輯 ---
+
+    function openZoomModal(src, title) {
+      currentImageSrc = src;
+      currentImageTitle = title;
+      zoomImg.src = src;
+      zoomTitle.textContent = title;
+      resetZoom();
+      zoomModal.classList.add('active');
+    }
+
+    function closeZoomModal() {
+      zoomModal.classList.remove('active');
+    }
+
+    function updateTransform() {
+      zoomImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
+      zoomLevelText.textContent = `${Math.round(currentScale * 100)}%`;
+    }
+
+    function resetZoom() {
+      currentScale = 1;
+      translateX = 0;
+      translateY = 0;
+      updateTransform();
+    }
+
+    function setScale(newScale, focusX = 0, focusY = 0) {
+      const minScale = 0.5;
+      const maxScale = 5;
+      newScale = Math.min(Math.max(newScale, minScale), maxScale);
+      currentScale = newScale;
+      updateTransform();
+    }
+
+    // 滾輪縮放
+    zoomViewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.15 : -0.15;
+      setScale(currentScale + delta);
+    }, { passive: false });
+
+    // 按鈕控制
+    zoomInBtn.onclick = () => setScale(currentScale + 0.25);
+    zoomOutBtn.onclick = () => setScale(currentScale - 0.25);
+    zoomResetBtn.onclick = resetZoom;
+    closeZoomBtn.onclick = closeZoomModal;
+    zoomDownloadBtn.onclick = () => downloadImage(currentImageSrc, currentImageTitle);
+
+    // 滑鼠拖曳 (Pan)
+    zoomViewport.addEventListener('mousedown', (e) => {
+      if (e.target.tagName === 'BUTTON') return;
+      isDragging = true;
+      startX = e.clientX - translateX;
+      startY = e.clientY - translateY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      translateX = e.clientX - startX;
+      translateY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    // 點擊背景空白處關閉 Modal
+    zoomModal.addEventListener('click', (e) => {
+      if (e.target === zoomModal || e.target === zoomViewport) {
+        closeZoomModal();
+      }
+    });
 
     init();
   </script>
