@@ -44,22 +44,27 @@
     /* 全螢幕圖表對比視窗 - 縱向 (Vertical) 垂直排列 */
     .compare-section { display: none; width: 100%; height: 100%; position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.85); z-index: 100; padding: 20px; flex-direction: column; }
     .compare-section.active { display: flex; }
-    .compare-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 16px; }
+    .compare-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
     .close-btn { background: #cf222e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    /* 高度調節滑桿控制區 */
+    .compare-controls { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; background: rgba(255,255,255,0.1); padding: 6px 16px; border-radius: 20px; }
+    .compare-controls input[type="range"] { cursor: pointer; }
 
     /* 縱向單欄佈局與滾動控制 */
     .compare-grid { 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
-      gap: 24px; 
+      gap: 16px; 
       flex: 1; 
       overflow-y: auto; 
       padding-right: 8px;
+      --chart-height: 300px; /* CSS 變數預設動態高度 */
     }
     .compare-item { 
       background: white; 
-      padding: 16px; 
+      padding: 12px 16px; 
       border-radius: 8px; 
       display: flex; 
       flex-direction: column; 
@@ -71,10 +76,10 @@
     .compare-item h3 { font-size: 1rem; color: #333; }
     .compare-item img { 
       width: 100%; 
-      height: auto; 
-      max-height: 80vh; 
-      object-fit: contain; 
+      height: var(--chart-height, 300px); /* 綁定高度變數 */
+      object-fit: contain; /* ★ 保持原始寬高比例，絕不扭曲變形 */
       cursor: zoom-in;
+      transition: height 0.15s ease-out; /* 縮放時呈現流暢過渡效果 */
     }
 
     /* 圖片放大檢視 Modal (Zoom Lightbox) */
@@ -172,6 +177,14 @@
   <div id="compare-section" class="compare-section">
     <div class="compare-header">
       <h2>圖表對比 (垂直視窗)</h2>
+
+      <!-- 高度調節器 控制介面 -->
+      <div class="compare-controls">
+        <label for="height-slider">圖表高度：</label>
+        <input type="range" id="height-slider" min="150" max="800" value="300" step="10">
+        <span id="height-val">300px</span>
+      </div>
+
       <button id="close-compare-btn" class="close-btn">關閉對比</button>
     </div>
     <div id="compare-grid" class="compare-grid"></div>
@@ -206,6 +219,10 @@
     const compareGrid = document.getElementById('compare-grid');
     const closeCompareBtn = document.getElementById('close-compare-btn');
 
+    // 對比高度 Slider 元素
+    const heightSlider = document.getElementById('height-slider');
+    const heightVal = document.getElementById('height-val');
+
     // Zoom Modal 元素
     const zoomModal = document.getElementById('zoom-modal');
     const zoomImg = document.getElementById('zoom-img');
@@ -234,6 +251,13 @@
       Condition: document.getElementById('filter-condition'),
       Date: document.getElementById('filter-date')
     };
+
+    // 高度 Slider 事件監聽
+    heightSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      heightVal.textContent = `${val}px`;
+      compareGrid.style.setProperty('--chart-height', `${val}px`);
+    });
 
     // 下載圖片通用函式
     function downloadImage(url, title) {
