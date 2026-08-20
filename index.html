@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>圖表分析儀表板2</title>
+  <title>圖表分析儀表板3</title>
   <style>
     /* 全域設定 */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,13 +19,16 @@
     select:focus { border-color: #0969da; }
 
     /* 按鈕與操作區 */
-    .action-bar { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .action-bar { margin-left: auto; display: flex; align-items: center; gap: 8px; }
     .btn { padding: 8px 16px; background-color: #2da44e; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
     .btn:hover { background-color: #2c974b; }
     .btn:disabled { background-color: #94d3a2; cursor: not-allowed; }
     
     .btn-secondary { background-color: #0969da; }
     .btn-secondary:hover { background-color: #0858b9; }
+    .btn-danger { background-color: #cf222e; color: white; }
+    .btn-danger:hover { background-color: #a40e26; }
+    .btn-danger:disabled { background-color: #f8c4c7; cursor: not-allowed; }
     .btn-sm { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; }
 
     /* 主要內容展示區 */
@@ -37,11 +40,10 @@
     .chart-card.selected { border-color: #0969da; background-color: #f0f7ff; }
     .chart-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 4px; background: #eee; cursor: zoom-in; }
     .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; }
-    .chart-title { font-weight: bold; margin-bottom: 6px; word-break: break-all; }
     .tag-badge { display: inline-block; background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin: 2px 2px 2px 0; }
     .card-actions { margin-top: 10px; display: flex; justify-content: flex-end; }
 
-    /* 全螢幕圖表對比視窗 - 縱向 (Vertical) 垂直排列 */
+    /* 全螢幕圖表對比視窗 */
     .compare-section { display: none; width: 100%; height: 100%; position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.85); z-index: 100; padding: 20px; flex-direction: column; }
     .compare-section.active { display: flex; }
     .compare-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
@@ -60,26 +62,36 @@
       flex: 1; 
       overflow-y: auto; 
       padding-right: 8px;
-      --chart-height: 300px; /* CSS 變數預設動態高度 */
+      --chart-height: 300px;
     }
     .compare-item { 
       background: white; 
-      padding: 12px 16px; 
+      padding: 12px; 
       border-radius: 8px; 
       display: flex; 
       flex-direction: column; 
       width: 100%; 
       max-width: 1000px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      position: relative;
     }
-    .compare-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .compare-item h3 { font-size: 1rem; color: #333; }
+    .compare-item .dl-btn-floating {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 10;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+    .compare-item:hover .dl-btn-floating {
+      opacity: 1;
+    }
     .compare-item img { 
       width: 100%; 
-      height: var(--chart-height, 300px); /* 綁定高度變數 */
-      object-fit: contain; /* ★ 保持原始寬高比例，絕不扭曲變形 */
+      height: var(--chart-height, 300px); 
+      object-fit: contain; /* 保持比例不變形 */
       cursor: zoom-in;
-      transition: height 0.15s ease-out; /* 縮放時呈現流暢過渡效果 */
+      transition: height 0.15s ease-out;
     }
 
     /* 圖片放大檢視 Modal (Zoom Lightbox) */
@@ -97,7 +109,7 @@
     .zoom-modal.active { display: flex; }
     .zoom-toolbar {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
       padding: 12px 24px;
       background: rgba(0, 0, 0, 0.5);
@@ -161,6 +173,8 @@
       </div>
 
       <div class="action-bar">
+        <!-- 一鍵取消選取按鈕 -->
+        <button id="clear-btn" class="btn btn-danger" disabled>清除選取</button>
         <button id="compare-btn" class="btn" disabled>對比選取圖表 (0)</button>
       </div>
     </div>
@@ -178,7 +192,7 @@
     <div class="compare-header">
       <h2>圖表對比 (垂直視窗)</h2>
 
-      <!-- 高度調節器 控制介面 -->
+      <!-- 高度調節器 -->
       <div class="compare-controls">
         <label for="height-slider">圖表高度：</label>
         <input type="range" id="height-slider" min="150" max="800" value="300" step="10">
@@ -193,7 +207,6 @@
   <!-- 圖片放大縮小 Modal -->
   <div id="zoom-modal" class="zoom-modal">
     <div class="zoom-toolbar">
-      <span id="zoom-title">圖表預覽</span>
       <div class="zoom-controls">
         <button id="zoom-out-btn" class="zoom-btn">－ 縮小</button>
         <span id="zoom-level">100%</span>
@@ -215,6 +228,7 @@
     // DOM 元素
     const chartGrid = document.getElementById('chart-grid');
     const compareBtn = document.getElementById('compare-btn');
+    const clearBtn = document.getElementById('clear-btn');
     const compareSection = document.getElementById('compare-section');
     const compareGrid = document.getElementById('compare-grid');
     const closeCompareBtn = document.getElementById('close-compare-btn');
@@ -226,7 +240,6 @@
     // Zoom Modal 元素
     const zoomModal = document.getElementById('zoom-modal');
     const zoomImg = document.getElementById('zoom-img');
-    const zoomTitle = document.getElementById('zoom-title');
     const zoomLevelText = document.getElementById('zoom-level');
     const zoomViewport = document.getElementById('zoom-viewport');
     const closeZoomBtn = document.getElementById('close-zoom-btn');
@@ -318,15 +331,15 @@
         card.className = `chart-card ${selectedIds.has(item.id) ? 'selected' : ''}`;
         
         // 點擊卡片空白或內文切換選取狀態
-        card.onclick = (e) => {
+        card.onclick = () => {
           toggleSelect(item.id, card);
         };
 
         const img = document.createElement('img');
         img.src = item.file;
-        img.alt = item.title;
+        img.alt = item.title || 'chart';
         img.loading = 'lazy';
-        // 點擊圖片本體開啟放大 Lightbox，不觸發卡片勾選
+        // 點擊圖片本體開啟放大 Lightbox
         img.onclick = (e) => {
           e.stopPropagation();
           openZoomModal(item.file, item.title);
@@ -335,12 +348,7 @@
         const info = document.createElement('div');
         info.className = 'chart-info';
 
-        const title = document.createElement('div');
-        title.className = 'chart-title';
-        title.textContent = item.title;
-
-        info.appendChild(title);
-
+        // 僅保留 Tag，不繪製獨立標題文字
         if (item.tags) {
           Object.entries(item.tags).forEach(([k, v]) => {
             const tag = document.createElement('span');
@@ -378,10 +386,25 @@
         selectedIds.add(id);
         cardElement.classList.add('selected');
       }
-
-      compareBtn.textContent = `對比選取圖表 (${selectedIds.size})`;
-      compareBtn.disabled = selectedIds.size === 0;
+      updateActionBar();
     }
+
+    // 更新操作按鈕狀態 (對比/清除選取)
+    function updateActionBar() {
+      const count = selectedIds.size;
+      compareBtn.textContent = `對比選取圖表 (${count})`;
+      compareBtn.disabled = count === 0;
+      clearBtn.disabled = count === 0;
+    }
+
+    // 一鍵取消所有選取
+    clearBtn.onclick = () => {
+      selectedIds.clear();
+      document.querySelectorAll('.chart-card.selected').forEach(card => {
+        card.classList.remove('selected');
+      });
+      updateActionBar();
+    };
 
     // 開啟對比視窗
     compareBtn.onclick = () => {
@@ -392,26 +415,21 @@
         const div = document.createElement('div');
         div.className = 'compare-item';
 
-        const headerDiv = document.createElement('div');
-        headerDiv.className = 'compare-item-header';
-
-        const title = document.createElement('h3');
-        title.textContent = item.title;
-
+        // 浮動下載按鈕 (不用額外標題列)
         const dlBtn = document.createElement('button');
-        dlBtn.className = 'btn btn-secondary btn-sm';
+        dlBtn.className = 'btn btn-secondary btn-sm dl-btn-floating';
         dlBtn.textContent = '下載圖表';
-        dlBtn.onclick = () => downloadImage(item.file, item.title);
-
-        headerDiv.appendChild(title);
-        headerDiv.appendChild(dlBtn);
+        dlBtn.onclick = (e) => {
+          e.stopPropagation();
+          downloadImage(item.file, item.title);
+        };
 
         const img = document.createElement('img');
         img.src = item.file;
-        img.alt = item.title;
+        img.alt = item.title || 'chart';
         img.onclick = () => openZoomModal(item.file, item.title);
 
-        div.appendChild(headerDiv);
+        div.appendChild(dlBtn);
         div.appendChild(img);
         compareGrid.appendChild(div);
       });
@@ -430,7 +448,6 @@
       currentImageSrc = src;
       currentImageTitle = title;
       zoomImg.src = src;
-      zoomTitle.textContent = title;
       resetZoom();
       zoomModal.classList.add('active');
     }
@@ -451,7 +468,7 @@
       updateTransform();
     }
 
-    function setScale(newScale, focusX = 0, focusY = 0) {
+    function setScale(newScale) {
       const minScale = 0.5;
       const maxScale = 5;
       newScale = Math.min(Math.max(newScale, minScale), maxScale);
