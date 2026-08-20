@@ -1,5 +1,197 @@
 [
   {
+    "id": "local_brightness_diff(A_25082526_normal)",
+    "title": "local_brightness_diff(A_25082526_normal)",
+    "file": "charts/local_brightness_diff(A_25082526_normal).png",
+    "tags": {
+      "part": "local",
+      "Metric": "brightness_diff",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25082526"
+    }
+  },
+  {
+    "id": "local_brightness_std(A_25082526_normal)",
+    "title": "local_brightness_std(A_25082526_normal)",
+    "file": "charts/local_brightness_std(A_25082526_normal).png",
+    "tags": {
+      "part": "local",
+      "Metric": "brightness_std",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25082526"
+    }
+  },
+  {
+    "id": "local_mean_brightness(A_25082526_normal)",
+    "title": "local_mean_brightness(A_25082526_normal)",
+    "file": "charts/local_mean_brightness(A_25082526_normal).png",
+    "tags": {
+      "part": "local",
+      "Metric": "mean_brightness",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25082526"
+    }
+  },
+  {
+    "id": "local_speed_px_per_s(A_25082526_normal)",
+    "title": "local_speed_px_per_s(A_25082526_normal)",
+    "file": "charts/local_speed_px_per_s(A_25082526_normal).png",
+    "tags": {
+      "part": "local",
+      "Metric": "speed_px_per_s",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25082526"
+    }
+  },
+  {
+    "id": "nighttime_brightness_diff(A_25082526_normal)",
+    "title": "nighttime_brightness_diff(A_25082526_normal)",
+    "file": "charts/nighttime_brightness_diff(A_25082526_normal).png",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "brightness_diff",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25082526"
+    }
+  },
+  {
+    "id": "nighttime_brightness_std(A_25082526_normal)",
+    "title": "nighttime_brightness_std(A_25082526_normal)",
+    "file": "charts/nighttime_brightness_std(A_25082526_normal).png",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "brightness_std",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25082526"
+    }
+  },
+  {
+    "id": "nighttime_mean_brightness(A_25082526_normal)",
+    "title": "nighttime_mean_brightness(A_25082526_normal)",
+    "file": "charts/nighttime_mean_brightness(A_25082526_normal).png",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "mean_brightness",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25082526"
+    }
+  },
+  {
+    "id": "nighttime_speed_px_per_s(A_25082526_normal)",
+    "title": "nighttime_speed_px_per_s(A_25082526_normal)",
+    "file": "charts/nighttime_speed_px_per_s(A_25082526_normal).png",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "speed_px_per_s",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25082526"
+    }
+  },
+  {
+    "id": "local_brightness_diff(A_25091213_normal)",
+    "title": "local_brightness_diff(A_25091213_normal)",
+    "file": "charts/local_brightness_diff(A_25091213_normal).png",
+    "tags": {
+      "part": "local",
+      "Metric": "brightness_diff",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25091213"
+    }
+  },
+  {
+    "id": "local_brightness_std(A_25091213_normal)",
+    "title": "local_brightness_std(A_25091213_normal)",
+    "file": "charts/local_brightness_std(A_25091213_normal).png",
+    "tags": {
+      "part": "local",
+      "Metric": "brightness_std",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25091213"
+    }
+  },
+  {
+    "id": "local_mean_brightness(A_25091213_normal)",
+    "title": "local_mean_brightness(A_25091213_normal)",
+    "file": "charts/local_mean_brightness(A_25091213_normal).png",
+    "tags": {
+      "part": "local",
+      "Metric": "mean_brightness",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25091213"
+    }
+  },
+  {
+    "id": "local_speed_px_per_s(A_25091213_normal)",
+    "title": "local_speed_px_per_s(A_25091213_normal)",
+    "file": "charts/local_speed_px_per_s(A_25091213_normal).png",
+    "tags": {
+      "part": "local",
+      "Metric": "speed_px_per_s",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25091213"
+    }
+  },
+  {
+    "id": "nighttime_brightness_diff(A_25091213_normal)",
+    "title": "nighttime_brightness_diff(A_25091213_normal)",
+    "file": "charts/nighttime_brightness_diff(A_25091213_normal).png",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "brightness_diff",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25091213"
+    }
+  },
+  {
+    "id": "nighttime_brightness_std(A_25091213_normal)",
+    "title": "nighttime_brightness_std(A_25091213_normal)",
+    "file": "charts/nighttime_brightness_std(A_25091213_normal).png",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "brightness_std",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25091213"
+    }
+  },
+  {
+    "id": "nighttime_mean_brightness(A_25091213_normal)",
+    "title": "nighttime_mean_brightness(A_25091213_normal)",
+    "file": "charts/nighttime_mean_brightness(A_25091213_normal).png",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "mean_brightness",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25091213"
+    }
+  },
+  {
+    "id": "nighttime_speed_px_per_s(A_25091213_normal)",
+    "title": "nighttime_speed_px_per_s(A_25091213_normal)",
+    "file": "charts/nighttime_speed_px_per_s(A_25091213_normal).png",
+    "tags": {
+      "part": "nighttime",
+      "Metric": "speed_px_per_s",
+      "Subject": "A",
+      "Condition": "normal",
+      "Date": "25091213"
+    }
+  },
+  {
     "id": "local_brightness_diff(B_25092223_normal)",
     "title": "local_brightness_diff(B_25092223_normal)",
     "file": "charts/local_brightness_diff(B_25092223_normal).png",
@@ -1823,7 +2015,6 @@
       "Date": "25121617"
     }
   },
-  [
   {
     "id": "local_brightness_diff(G_25111516_water_flow)",
     "title": "local_brightness_diff(G_25111516_water_flow)",
@@ -2496,5 +2687,4 @@
       "Date": "26010708"
     }
   }
-]
 ]
