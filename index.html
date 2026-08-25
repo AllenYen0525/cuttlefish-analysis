@@ -39,14 +39,13 @@
     .chart-card:hover { border-color: #0969da; }
     .chart-card.selected { border-color: #0969da; background-color: #f0f7ff; }
     .chart-card img { width: 100%; height: 180px; object-fit: contain; border-radius: 4px; background: #eee; cursor: zoom-in; }
-    .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; }
     .tag-badge { display: inline-block; background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin: 2px 2px 2px 0; }
     
-    /* 專屬數值標記面板 */
+    /* 數值標記面板 (僅在主畫面顯示) */
     .metric-stats-box { margin-top: 6px; padding: 6px 8px; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; font-size: 0.76rem; }
     .metric-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
     .metric-row:last-child { margin-bottom: 0; }
-    .val-sig { color: #cf222e; font-weight: bold; }
     .val-tag { background: #ddf4ff; color: #0969da; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
     .val-events { font-size: 0.72rem; color: #586069; }
 
@@ -292,11 +291,6 @@
     }
 
     const fmt = (v, d = 2) => (v !== null && v !== undefined && !isNaN(v)) ? Number(v).toFixed(d) : '-';
-    const fmtP = (p) => {
-      if (p === null || p === undefined || isNaN(p)) return '-';
-      if (p === 0) return '0.000';
-      return p < 0.001 ? '< 0.001' : Number(p).toFixed(3);
-    };
 
     // 依據 Date 與 Subject 自動匹配統計數值
     function findMatchedStats(item, statList) {
@@ -315,7 +309,7 @@
       return null;
     }
 
-    // 初始化：載入 data.json 與 data_QS_AS.json
+    // 初始化讀取 data.json 與 data_QS_AS.json
     async function init() {
       try {
         const [tagList, statList] = await Promise.all([
@@ -331,8 +325,8 @@
         populateFilterOptions();
         renderGallery();
       } catch (err) {
-        console.error('無法載入資料:', err);
-        chartGrid.innerHTML = '<p style="color:red; padding: 20px;">載入 data.json 失敗，請確認檔案是否已 Push 至 GitHub。</p>';
+        console.error('無法載入 data.json:', err);
+        chartGrid.innerHTML = '<p style="color:red;">載入 data.json 失敗，請確認檔案路徑是否正確。</p>';
       }
     }
 
@@ -356,7 +350,7 @@
       });
     }
 
-    // 依據該張圖的 Metric 單獨產生對應數值方塊
+    // 依據該張圖的 Metric 產生對應數值方塊
     function generateMetricStatsHtml(item) {
       if (!item.matchedStats || !item.matchedStats.stats) return '';
       const s = item.matchedStats.stats;
@@ -381,7 +375,6 @@
       const asVal = target.as_mean !== null && target.as_mean !== undefined ? `${fmt(target.as_mean)} ± ${fmt(target.as_std, 1)}` : '-';
       const qsVal = target.qs_mean !== null && target.qs_mean !== undefined ? `${fmt(target.qs_mean)} ± ${fmt(target.qs_std, 1)}` : '-';
       const ratioVal = target.ratio !== null && target.ratio !== undefined ? fmt(target.ratio) : '-';
-      const isSig = target.p_value !== null && target.p_value < 0.05;
 
       return `
         <div class="metric-stats-box">
@@ -394,8 +387,8 @@
             <span><b>QS:</b> ${qsVal}</span>
           </div>
           <div class="metric-row" style="margin-top: 3px; border-top: 1px dashed #e2e8f0; padding-top: 3px;">
-            <span class="val-tag">Ratio: ${ratioVal}</span>
-            <span class="${isSig ? 'val-sig' : ''}">p: ${fmtP(target.p_value)}</span>
+            <span>Ratio (AS/QS):</span>
+            <span class="val-tag">${ratioVal}</span>
           </div>
         </div>
       `;
@@ -436,14 +429,12 @@
 
         // 僅保留 Tag，不繪製獨立標題文字
         if (item.tags) {
-          const tagsContainer = document.createElement('div');
           Object.entries(item.tags).forEach(([k, v]) => {
             const tag = document.createElement('span');
             tag.className = 'tag-badge';
             tag.textContent = `${k}: ${v}`;
-            tagsContainer.appendChild(tag);
+            info.appendChild(tag);
           });
-          info.appendChild(tagsContainer);
         }
 
         // 插入符合條件的專屬數值標記
@@ -502,7 +493,7 @@
       updateActionBar();
     };
 
-    // 開啟對比視窗
+    // 開啟對比視窗 (此處完全隱藏數值標記，僅展示純圖)
     compareBtn.onclick = () => {
       compareGrid.innerHTML = '';
       const selectedItems = rawData.filter(item => selectedIds.has(item.id));
@@ -511,7 +502,7 @@
         const div = document.createElement('div');
         div.className = 'compare-item';
 
-        // 浮動下載按鈕 (不用額外標題列)
+        // 浮動下載按鈕
         const dlBtn = document.createElement('button');
         dlBtn.className = 'btn btn-secondary btn-sm dl-btn-floating';
         dlBtn.textContent = '下載圖表';
@@ -527,16 +518,6 @@
 
         div.appendChild(dlBtn);
         div.appendChild(img);
-
-        // 對比視窗下方同步顯示專屬數值標記
-        const statsHtml = generateMetricStatsHtml(item);
-        if (statsHtml) {
-          const statsDiv = document.createElement('div');
-          statsDiv.style.marginTop = '8px';
-          statsDiv.innerHTML = statsHtml;
-          div.appendChild(statsDiv);
-        }
-
         compareGrid.appendChild(div);
       });
 
