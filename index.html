@@ -39,15 +39,16 @@
     .chart-card:hover { border-color: #0969da; }
     .chart-card.selected { border-color: #0969da; background-color: #f0f7ff; }
     .chart-card img { width: 100%; height: 180px; object-fit: contain; border-radius: 4px; background: #eee; cursor: zoom-in; }
-    .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; }
+    .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; display: flex; flex-direction: column; gap: 6px; }
     .tag-badge { display: inline-block; background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin: 2px 2px 2px 0; }
     
-    /* 數值標記面板 */
+    /* 專屬數值標記面板 */
     .metric-stats-box { margin-top: 6px; padding: 6px 8px; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; font-size: 0.76rem; }
     .metric-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
     .metric-row:last-child { margin-bottom: 0; }
     .val-sig { color: #cf222e; font-weight: bold; }
     .val-tag { background: #ddf4ff; color: #0969da; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
+    .val-events { font-size: 0.72rem; color: #586069; }
 
     .card-actions { margin-top: 10px; display: flex; justify-content: flex-end; }
 
@@ -314,7 +315,7 @@
       return null;
     }
 
-    // 初始化讀取 data.json 與 data_QS_AS.json
+    // 初始化：載入 data.json 與 data_QS_AS.json
     async function init() {
       try {
         const [tagList, statList] = await Promise.all([
@@ -330,8 +331,8 @@
         populateFilterOptions();
         renderGallery();
       } catch (err) {
-        console.error('無法載入 data.json:', err);
-        chartGrid.innerHTML = '<p style="color:red;">載入 data.json 失敗，請確認檔案路徑是否正確。</p>';
+        console.error('無法載入資料:', err);
+        chartGrid.innerHTML = '<p style="color:red; padding: 20px;">載入 data.json 失敗，請確認檔案是否已 Push 至 GitHub。</p>';
       }
     }
 
@@ -435,12 +436,14 @@
 
         // 僅保留 Tag，不繪製獨立標題文字
         if (item.tags) {
+          const tagsContainer = document.createElement('div');
           Object.entries(item.tags).forEach(([k, v]) => {
             const tag = document.createElement('span');
             tag.className = 'tag-badge';
             tag.textContent = `${k}: ${v}`;
-            info.appendChild(tag);
+            tagsContainer.appendChild(tag);
           });
+          info.appendChild(tagsContainer);
         }
 
         // 插入符合條件的專屬數值標記
