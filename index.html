@@ -92,9 +92,7 @@
       opacity: 0.8; 
       transition: opacity 0.2s; 
     }
-    .compare-item:hover .dl-btn-floating { 
-      opacity: 1; 
-    }
+    .compare-item:hover .dl-btn-floating { opacity: 1; }
     .compare-item img { 
       width: 100%; 
       height: var(--chart-height, 300px); 
@@ -103,7 +101,7 @@
       transition: height 0.15s ease-out; 
     }
 
-    /* 圖片放大檢視 Modal (Zoom Lightbox) */
+    /* 圖片放大檢視 Modal */
     .zoom-modal { 
       display: none; 
       position: fixed; 
@@ -182,7 +180,6 @@
       </div>
 
       <div class="action-bar">
-        <!-- 一鍵取消選取按鈕 -->
         <button id="clear-btn" class="btn btn-danger" disabled>清除選取</button>
         <button id="compare-btn" class="btn" disabled>對比選取圖表 (0)</button>
       </div>
@@ -200,14 +197,11 @@
   <div id="compare-section" class="compare-section">
     <div class="compare-header">
       <h2>圖表對比 (垂直視窗)</h2>
-
-      <!-- 高度調節器 -->
       <div class="compare-controls">
         <label for="height-slider">圖表高度：</label>
         <input type="range" id="height-slider" min="150" max="800" value="300" step="10">
         <span id="height-val">300px</span>
       </div>
-
       <button id="close-compare-btn" class="close-btn">關閉對比</button>
     </div>
     <div id="compare-grid" class="compare-grid"></div>
@@ -234,7 +228,6 @@
     let rawData = [];
     const selectedIds = new Set();
 
-    // DOM 元素
     const chartGrid = document.getElementById('chart-grid');
     const compareBtn = document.getElementById('compare-btn');
     const clearBtn = document.getElementById('clear-btn');
@@ -242,11 +235,9 @@
     const compareGrid = document.getElementById('compare-grid');
     const closeCompareBtn = document.getElementById('close-compare-btn');
 
-    // 對比高度 Slider 元素
     const heightSlider = document.getElementById('height-slider');
     const heightVal = document.getElementById('height-val');
 
-    // Zoom Modal 元素
     const zoomModal = document.getElementById('zoom-modal');
     const zoomImg = document.getElementById('zoom-img');
     const zoomLevelText = document.getElementById('zoom-level');
@@ -257,14 +248,8 @@
     const zoomResetBtn = document.getElementById('zoom-reset-btn');
     const zoomDownloadBtn = document.getElementById('zoom-download-btn');
 
-    // Zoom & Drag 狀態管理
-    let currentScale = 1;
-    let translateX = 0;
-    let translateY = 0;
-    let isDragging = false;
-    let startX = 0, startY = 0;
-    let currentImageSrc = '';
-    let currentImageTitle = '';
+    let currentScale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0;
+    let currentImageSrc = '', currentImageTitle = '';
 
     const filters = {
       part: document.getElementById('filter-part'),
@@ -274,14 +259,12 @@
       Date: document.getElementById('filter-date')
     };
 
-    // 高度 Slider 事件監聽
     heightSlider.addEventListener('input', (e) => {
       const val = e.target.value;
       heightVal.textContent = `${val}px`;
       compareGrid.style.setProperty('--chart-height', `${val}px`);
     });
 
-    // 下載圖片通用函式
     function downloadImage(url, title) {
       const link = document.createElement('a');
       link.href = url;
@@ -298,44 +281,55 @@
       return p < 0.001 ? '< 0.001' : Number(p).toFixed(3);
     };
 
-    // 自動匹配 data.json 的個別圖檔與 data_QS_AS.json 的統計數據
+    // 自動匹配 data.json 的圖表與 data_QS_AS.json 的數值
     function findMatchedStats(item, statList) {
+      if (!statList || statList.length === 0) return null;
       const tags = item.tags || {};
       const subject = (tags.Subject || '').toUpperCase();
       const dateVal = (tags.Date || '').replace(/[^0-9]/g, '');
-      const fileStr = (item.file || item.id || '').toLowerCase();
 
       for (const s of statList) {
         const sInd = (s.individual || '').toUpperCase();
         const sFile = (s.file_image || '').toLowerCase();
         
-        // 1. 檔名中的 8 位數日期匹配 (如 25082526)
-        const dateMatch = sFile.match(/25\d{6}|26\d{6}/);
-        if (dateMatch && (dateVal.includes(dateMatch[0]) || fileStr.includes(dateMatch[0]))) {
+        // 依據 8 碼日期比對 (例如 25082526)
+        if (dateVal && sFile.includes(dateVal)) {
           if (!subject || sInd === subject) return s;
-        }
-
-        // 2. 日期字串比對 (如 2025-08-25 ~ 2025-08-26 轉為 25082526)
-        if (s.date && dateVal) {
-          const sDateClean = s.date.replace(/[^0-9]/g, '');
-          if (sDateClean.includes(dateVal) && (!subject || sInd === subject)) {
-            return s;
-          }
         }
       }
       return null;
     }
 
-    // 初始化：讀取 data.json，並從 data_QS_AS.json 同步統計指標
+    // 初始化：增強容錯與錯誤捕獲
     async function init() {
       try {
-        const [tagsRes, statsRes] = await Promise.allSettled([
-          fetch('data.json').then(r => r.json()),
-          fetch('data_QS_AS.json').then(r => r.json())
-        ]);
+        let tagList = [];
+        let statList = [];
 
-        const tagList = tagsRes.status === 'fulfilled' ? tagsRes.value : [];
-        const statList = statsRes.status === 'fulfilled' ? statsRes.value : [];
+        // 1. 讀取主資料 data.json
+        try {
+          const res = await fetch('data.json');
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          tagList = await res.json();
+        } catch (e) {
+          console.error('載入 data.json 失敗:', e);
+          chartGrid.innerHTML = `
+            <div style="padding: 24px; color: #cf222e; background: #ffebe9; border: 1px solid #ffc1c0; border-radius: 6px; width: 100%;">
+              <h3>⚠️ 無法讀取 data.json</h3>
+              <p style="margin-top: 8px; font-size: 0.9rem;">如果是直接雙擊開啟 HTML 檔案，瀏覽器會因安全限制（CORS）阻擋讀取 JSON。</p>
+              <p style="margin-top: 6px; font-size: 0.85rem; color: #586069;">建議使用 VS Code 的 <b>Live Server</b> 套件開啟，或在終端機執行 <code>python -m http.server</code> 後開啟 <code>http://localhost:8000</code>。</p>
+            </div>
+          `;
+          return;
+        }
+
+        // 2. 讀取統計資料 (嘗試 data_QS_AS.json 或 data_QS_AS_2.json)
+        try {
+          const statsRes = await fetch('data_QS_AS.json').catch(() => fetch('data_QS_AS_2.json'));
+          if (statsRes.ok) statList = await statsRes.json();
+        } catch (e) {
+          console.warn('未載入統計數據檔，將以純圖表模式呈現');
+        }
 
         rawData = tagList.map((item, idx) => ({
           ...item,
@@ -346,12 +340,10 @@
         populateFilterOptions();
         renderGallery();
       } catch (err) {
-        console.error('無法載入 data.json:', err);
-        chartGrid.innerHTML = '<p style="color:red; padding: 20px;">載入 data.json 失敗，請確認檔案路徑是否正確。</p>';
+        console.error('初始化執行錯誤:', err);
       }
     }
 
-    // 動態生成選單選項
     function populateFilterOptions() {
       const keys = ['part', 'Metric', 'Subject', 'Condition', 'Date'];
       keys.forEach(key => {
@@ -371,7 +363,7 @@
       });
     }
 
-    // 依據該張圖的 Metric 單獨渲染對應數值 (亮度圖顯示亮度、位移圖顯示速度、波動圖顯示標準差)
+    // 依據 Metric 顯示專屬數值方塊
     function renderSpecificMetricBox(item) {
       if (!item.matchedStats || !item.matchedStats.stats) return '';
       const s = item.matchedStats.stats;
@@ -416,7 +408,6 @@
       `;
     }
 
-    // 渲染圖表清單
     function renderGallery() {
       chartGrid.innerHTML = '';
 
@@ -430,26 +421,20 @@
       filteredData.forEach(item => {
         const card = document.createElement('div');
         card.className = `chart-card ${selectedIds.has(item.id) ? 'selected' : ''}`;
-        
-        // 點擊卡片空白或內文切換選取狀態
-        card.onclick = () => {
-          toggleSelect(item.id, card);
-        };
+        card.onclick = () => toggleSelect(item.id, card);
 
         const img = document.createElement('img');
         img.src = item.file;
         img.alt = item.title || 'chart';
         img.loading = 'lazy';
-        // 點擊圖片本體開啟放大 Lightbox
         img.onclick = (e) => {
           e.stopPropagation();
-          openZoomModal(item.file, item.title);
+          openZoomModal(item.file, item.title || item.id);
         };
 
         const info = document.createElement('div');
         info.className = 'chart-info';
 
-        // 標籤徽章
         const tagsContainer = document.createElement('div');
         if (item.tags) {
           Object.entries(item.tags).forEach(([k, v]) => {
@@ -461,7 +446,6 @@
         }
         info.appendChild(tagsContainer);
 
-        // 插入專屬數值標記
         const metricBoxHtml = renderSpecificMetricBox(item);
         if (metricBoxHtml) {
           const metricDiv = document.createElement('div');
@@ -469,7 +453,6 @@
           info.appendChild(metricDiv);
         }
 
-        // 下載按鈕
         const actions = document.createElement('div');
         actions.className = 'card-actions';
         const dlBtn = document.createElement('button');
@@ -477,7 +460,7 @@
         dlBtn.textContent = '下載圖片';
         dlBtn.onclick = (e) => {
           e.stopPropagation();
-          downloadImage(item.file, item.title);
+          downloadImage(item.file, item.title || item.id);
         };
         actions.appendChild(dlBtn);
 
@@ -488,7 +471,6 @@
       });
     }
 
-    // 切換選取狀態
     function toggleSelect(id, cardElement) {
       if (selectedIds.has(id)) {
         selectedIds.delete(id);
@@ -500,7 +482,6 @@
       updateActionBar();
     }
 
-    // 更新操作按鈕狀態 (對比/清除選取)
     function updateActionBar() {
       const count = selectedIds.size;
       compareBtn.textContent = `對比選取圖表 (${count})`;
@@ -508,7 +489,6 @@
       clearBtn.disabled = count === 0;
     }
 
-    // 一鍵取消所有選取
     clearBtn.onclick = () => {
       selectedIds.clear();
       document.querySelectorAll('.chart-card.selected').forEach(card => {
@@ -517,7 +497,6 @@
       updateActionBar();
     };
 
-    // 開啟對比視窗
     compareBtn.onclick = () => {
       compareGrid.innerHTML = '';
       const selectedItems = rawData.filter(item => selectedIds.has(item.id));
@@ -526,24 +505,22 @@
         const div = document.createElement('div');
         div.className = 'compare-item';
 
-        // 浮動下載按鈕
         const dlBtn = document.createElement('button');
         dlBtn.className = 'btn btn-secondary btn-sm dl-btn-floating';
         dlBtn.textContent = '下載圖表';
         dlBtn.onclick = (e) => {
           e.stopPropagation();
-          downloadImage(item.file, item.title);
+          downloadImage(item.file, item.title || item.id);
         };
 
         const img = document.createElement('img');
         img.src = item.file;
         img.alt = item.title || 'chart';
-        img.onclick = () => openZoomModal(item.file, item.title);
+        img.onclick = () => openZoomModal(item.file, item.title || item.id);
 
         div.appendChild(dlBtn);
         div.appendChild(img);
 
-        // 對比視窗下方同步加上專屬數值標記
         const metricBoxHtml = renderSpecificMetricBox(item);
         if (metricBoxHtml) {
           const metricDiv = document.createElement('div');
@@ -558,12 +535,9 @@
       compareSection.classList.add('active');
     };
 
-    // 關閉對比視窗
     closeCompareBtn.onclick = () => {
       compareSection.classList.remove('active');
     };
-
-    // --- 圖片放大/縮小/拖曳 (Zoom/Pan Modal) 控制邏輯 ---
 
     function openZoomModal(src, title) {
       currentImageSrc = src;
@@ -597,21 +571,18 @@
       updateTransform();
     }
 
-    // 滾輪縮放
     zoomViewport.addEventListener('wheel', (e) => {
       e.preventDefault();
       const delta = e.deltaY < 0 ? 0.15 : -0.15;
       setScale(currentScale + delta);
     }, { passive: false });
 
-    // 按鈕控制
     zoomInBtn.onclick = () => setScale(currentScale + 0.25);
     zoomOutBtn.onclick = () => setScale(currentScale - 0.25);
     zoomResetBtn.onclick = resetZoom;
     closeZoomBtn.onclick = closeZoomModal;
     zoomDownloadBtn.onclick = () => downloadImage(currentImageSrc, currentImageTitle);
 
-    // 滑鼠拖曳 (Pan)
     zoomViewport.addEventListener('mousedown', (e) => {
       if (e.target.tagName === 'BUTTON') return;
       isDragging = true;
@@ -630,7 +601,6 @@
       isDragging = false;
     });
 
-    // 點擊背景空白處關閉 Modal
     zoomModal.addEventListener('click', (e) => {
       if (e.target === zoomModal || e.target === zoomViewport) {
         closeZoomModal();
