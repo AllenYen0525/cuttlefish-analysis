@@ -39,16 +39,15 @@
     .chart-card:hover { border-color: #0969da; }
     .chart-card.selected { border-color: #0969da; background-color: #f0f7ff; }
     .chart-card img { width: 100%; height: 180px; object-fit: contain; border-radius: 4px; background: #eee; cursor: zoom-in; }
-    .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; }
     .tag-badge { display: inline-block; background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin: 2px 2px 2px 0; }
     
-    /* 專屬數值標記面板 */
-    .metric-stats-box { margin-top: 4px; padding: 6px 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.76rem; }
+    /* 數值標記面板 */
+    .metric-stats-box { margin-top: 6px; padding: 6px 8px; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; font-size: 0.76rem; }
     .metric-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
     .metric-row:last-child { margin-bottom: 0; }
     .val-sig { color: #cf222e; font-weight: bold; }
-    .val-tag { background: #e0f2fe; color: #0369a1; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
-    .val-events { font-size: 0.72rem; color: #586069; }
+    .val-tag { background: #ddf4ff; color: #0969da; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
 
     .card-actions { margin-top: 10px; display: flex; justify-content: flex-end; }
 
@@ -92,7 +91,9 @@
       opacity: 0.8; 
       transition: opacity 0.2s; 
     }
-    .compare-item:hover .dl-btn-floating { opacity: 1; }
+    .compare-item:hover .dl-btn-floating { 
+      opacity: 1; 
+    }
     .compare-item img { 
       width: 100%; 
       height: var(--chart-height, 300px); 
@@ -101,7 +102,7 @@
       transition: height 0.15s ease-out; 
     }
 
-    /* 圖片放大檢視 Modal */
+    /* 圖片放大檢視 Modal (Zoom Lightbox) */
     .zoom-modal { 
       display: none; 
       position: fixed; 
@@ -180,6 +181,7 @@
       </div>
 
       <div class="action-bar">
+        <!-- 一鍵取消選取按鈕 -->
         <button id="clear-btn" class="btn btn-danger" disabled>清除選取</button>
         <button id="compare-btn" class="btn" disabled>對比選取圖表 (0)</button>
       </div>
@@ -197,11 +199,14 @@
   <div id="compare-section" class="compare-section">
     <div class="compare-header">
       <h2>圖表對比 (垂直視窗)</h2>
+
+      <!-- 高度調節器 -->
       <div class="compare-controls">
         <label for="height-slider">圖表高度：</label>
         <input type="range" id="height-slider" min="150" max="800" value="300" step="10">
         <span id="height-val">300px</span>
       </div>
+
       <button id="close-compare-btn" class="close-btn">關閉對比</button>
     </div>
     <div id="compare-grid" class="compare-grid"></div>
@@ -228,6 +233,7 @@
     let rawData = [];
     const selectedIds = new Set();
 
+    // DOM 元素
     const chartGrid = document.getElementById('chart-grid');
     const compareBtn = document.getElementById('compare-btn');
     const clearBtn = document.getElementById('clear-btn');
@@ -235,9 +241,11 @@
     const compareGrid = document.getElementById('compare-grid');
     const closeCompareBtn = document.getElementById('close-compare-btn');
 
+    // 對比高度 Slider 元素
     const heightSlider = document.getElementById('height-slider');
     const heightVal = document.getElementById('height-val');
 
+    // Zoom Modal 元素
     const zoomModal = document.getElementById('zoom-modal');
     const zoomImg = document.getElementById('zoom-img');
     const zoomLevelText = document.getElementById('zoom-level');
@@ -248,8 +256,14 @@
     const zoomResetBtn = document.getElementById('zoom-reset-btn');
     const zoomDownloadBtn = document.getElementById('zoom-download-btn');
 
-    let currentScale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0;
-    let currentImageSrc = '', currentImageTitle = '';
+    // Zoom & Drag 狀態管理
+    let currentScale = 1;
+    let translateX = 0;
+    let translateY = 0;
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let currentImageSrc = '';
+    let currentImageTitle = '';
 
     const filters = {
       part: document.getElementById('filter-part'),
@@ -259,12 +273,14 @@
       Date: document.getElementById('filter-date')
     };
 
+    // 高度 Slider 事件監聽
     heightSlider.addEventListener('input', (e) => {
       const val = e.target.value;
       heightVal.textContent = `${val}px`;
       compareGrid.style.setProperty('--chart-height', `${val}px`);
     });
 
+    // 下載圖片通用函式
     function downloadImage(url, title) {
       const link = document.createElement('a');
       link.href = url;
@@ -281,7 +297,7 @@
       return p < 0.001 ? '< 0.001' : Number(p).toFixed(3);
     };
 
-    // 自動匹配 data.json 的圖表與 data_QS_AS.json 的數值
+    // 依據 Date 與 Subject 自動匹配統計數值
     function findMatchedStats(item, statList) {
       if (!statList || statList.length === 0) return null;
       const tags = item.tags || {};
@@ -291,8 +307,6 @@
       for (const s of statList) {
         const sInd = (s.individual || '').toUpperCase();
         const sFile = (s.file_image || '').toLowerCase();
-        
-        // 依據 8 碼日期比對 (例如 25082526)
         if (dateVal && sFile.includes(dateVal)) {
           if (!subject || sInd === subject) return s;
         }
@@ -300,50 +314,28 @@
       return null;
     }
 
-    // 初始化：增強容錯與錯誤捕獲
+    // 初始化讀取 data.json 與 data_QS_AS.json
     async function init() {
       try {
-        let tagList = [];
-        let statList = [];
+        const [tagList, statList] = await Promise.all([
+          fetch('data.json').then(r => r.json()),
+          fetch('data_QS_AS.json').then(r => r.json()).catch(() => [])
+        ]);
 
-        // 1. 讀取主資料 data.json
-        try {
-          const res = await fetch('data.json');
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          tagList = await res.json();
-        } catch (e) {
-          console.error('載入 data.json 失敗:', e);
-          chartGrid.innerHTML = `
-            <div style="padding: 24px; color: #cf222e; background: #ffebe9; border: 1px solid #ffc1c0; border-radius: 6px; width: 100%;">
-              <h3>⚠️ 無法讀取 data.json</h3>
-              <p style="margin-top: 8px; font-size: 0.9rem;">如果是直接雙擊開啟 HTML 檔案，瀏覽器會因安全限制（CORS）阻擋讀取 JSON。</p>
-              <p style="margin-top: 6px; font-size: 0.85rem; color: #586069;">建議使用 VS Code 的 <b>Live Server</b> 套件開啟，或在終端機執行 <code>python -m http.server</code> 後開啟 <code>http://localhost:8000</code>。</p>
-            </div>
-          `;
-          return;
-        }
-
-        // 2. 讀取統計資料 (嘗試 data_QS_AS.json 或 data_QS_AS_2.json)
-        try {
-          const statsRes = await fetch('data_QS_AS.json').catch(() => fetch('data_QS_AS_2.json'));
-          if (statsRes.ok) statList = await statsRes.json();
-        } catch (e) {
-          console.warn('未載入統計數據檔，將以純圖表模式呈現');
-        }
-
-        rawData = tagList.map((item, idx) => ({
+        rawData = tagList.map(item => ({
           ...item,
-          id: item.id || `chart_${idx + 1}`,
           matchedStats: findMatchedStats(item, statList)
         }));
 
         populateFilterOptions();
         renderGallery();
       } catch (err) {
-        console.error('初始化執行錯誤:', err);
+        console.error('無法載入 data.json:', err);
+        chartGrid.innerHTML = '<p style="color:red;">載入 data.json 失敗，請確認檔案路徑是否正確。</p>';
       }
     }
 
+    // 動態生成選單選項
     function populateFilterOptions() {
       const keys = ['part', 'Metric', 'Subject', 'Condition', 'Date'];
       keys.forEach(key => {
@@ -363,23 +355,23 @@
       });
     }
 
-    // 依據 Metric 顯示專屬數值方塊
-    function renderSpecificMetricBox(item) {
+    // 依據該張圖的 Metric 單獨產生對應數值方塊
+    function generateMetricStatsHtml(item) {
       if (!item.matchedStats || !item.matchedStats.stats) return '';
       const s = item.matchedStats.stats;
-      const metricTag = (item.tags && item.tags.Metric ? item.tags.Metric : item.file || '').toLowerCase();
+      const metricTag = (item.tags && item.tags.Metric ? item.tags.Metric : '').toLowerCase();
       
       let target = null;
-      let title = '';
+      let label = '';
 
       if (metricTag.includes('speed') || metricTag.includes('位移') || metricTag.includes('速度')) {
-        title = '位移速度 (Speed px/s)';
+        label = 'Speed (px/s)';
         target = s.speed;
       } else if (metricTag.includes('std') || metricTag.includes('波動')) {
-        title = '亮度波動 (Brightness SD)';
+        label = 'Brightness SD';
         target = s.brightness_std;
       } else if (metricTag.includes('mean_brightness') || metricTag.includes('brightness_diff') || metricTag.includes('bright') || metricTag.includes('亮度')) {
-        title = '亮度 (Mean Brightness)';
+        label = 'Mean Brightness';
         target = s.mean_brightness;
       }
 
@@ -393,7 +385,7 @@
       return `
         <div class="metric-stats-box">
           <div class="metric-row">
-            <span><b>${title}</b></span>
+            <span><b>${label}</b></span>
             <span class="val-events">AS: ${item.matchedStats.n_AS_events ?? '-'}次 | QS: ${item.matchedStats.n_QS_events ?? '-'}次</span>
           </div>
           <div class="metric-row">
@@ -408,6 +400,7 @@
       `;
     }
 
+    // 渲染圖表清單
     function renderGallery() {
       chartGrid.innerHTML = '';
 
@@ -421,38 +414,44 @@
       filteredData.forEach(item => {
         const card = document.createElement('div');
         card.className = `chart-card ${selectedIds.has(item.id) ? 'selected' : ''}`;
-        card.onclick = () => toggleSelect(item.id, card);
+        
+        // 點擊卡片空白或內文切換選取狀態
+        card.onclick = () => {
+          toggleSelect(item.id, card);
+        };
 
         const img = document.createElement('img');
         img.src = item.file;
         img.alt = item.title || 'chart';
         img.loading = 'lazy';
+        // 點擊圖片本體開啟放大 Lightbox
         img.onclick = (e) => {
           e.stopPropagation();
-          openZoomModal(item.file, item.title || item.id);
+          openZoomModal(item.file, item.title);
         };
 
         const info = document.createElement('div');
         info.className = 'chart-info';
 
-        const tagsContainer = document.createElement('div');
+        // 僅保留 Tag，不繪製獨立標題文字
         if (item.tags) {
           Object.entries(item.tags).forEach(([k, v]) => {
             const tag = document.createElement('span');
             tag.className = 'tag-badge';
             tag.textContent = `${k}: ${v}`;
-            tagsContainer.appendChild(tag);
+            info.appendChild(tag);
           });
         }
-        info.appendChild(tagsContainer);
 
-        const metricBoxHtml = renderSpecificMetricBox(item);
-        if (metricBoxHtml) {
-          const metricDiv = document.createElement('div');
-          metricDiv.innerHTML = metricBoxHtml;
-          info.appendChild(metricDiv);
+        // 插入符合條件的專屬數值標記
+        const statsHtml = generateMetricStatsHtml(item);
+        if (statsHtml) {
+          const statsDiv = document.createElement('div');
+          statsDiv.innerHTML = statsHtml;
+          info.appendChild(statsDiv);
         }
 
+        // 下載按鈕
         const actions = document.createElement('div');
         actions.className = 'card-actions';
         const dlBtn = document.createElement('button');
@@ -460,7 +459,7 @@
         dlBtn.textContent = '下載圖片';
         dlBtn.onclick = (e) => {
           e.stopPropagation();
-          downloadImage(item.file, item.title || item.id);
+          downloadImage(item.file, item.title);
         };
         actions.appendChild(dlBtn);
 
@@ -471,6 +470,7 @@
       });
     }
 
+    // 切換選取狀態
     function toggleSelect(id, cardElement) {
       if (selectedIds.has(id)) {
         selectedIds.delete(id);
@@ -482,6 +482,7 @@
       updateActionBar();
     }
 
+    // 更新操作按鈕狀態 (對比/清除選取)
     function updateActionBar() {
       const count = selectedIds.size;
       compareBtn.textContent = `對比選取圖表 (${count})`;
@@ -489,6 +490,7 @@
       clearBtn.disabled = count === 0;
     }
 
+    // 一鍵取消所有選取
     clearBtn.onclick = () => {
       selectedIds.clear();
       document.querySelectorAll('.chart-card.selected').forEach(card => {
@@ -497,6 +499,7 @@
       updateActionBar();
     };
 
+    // 開啟對比視窗
     compareBtn.onclick = () => {
       compareGrid.innerHTML = '';
       const selectedItems = rawData.filter(item => selectedIds.has(item.id));
@@ -505,28 +508,30 @@
         const div = document.createElement('div');
         div.className = 'compare-item';
 
+        // 浮動下載按鈕 (不用額外標題列)
         const dlBtn = document.createElement('button');
         dlBtn.className = 'btn btn-secondary btn-sm dl-btn-floating';
         dlBtn.textContent = '下載圖表';
         dlBtn.onclick = (e) => {
           e.stopPropagation();
-          downloadImage(item.file, item.title || item.id);
+          downloadImage(item.file, item.title);
         };
 
         const img = document.createElement('img');
         img.src = item.file;
         img.alt = item.title || 'chart';
-        img.onclick = () => openZoomModal(item.file, item.title || item.id);
+        img.onclick = () => openZoomModal(item.file, item.title);
 
         div.appendChild(dlBtn);
         div.appendChild(img);
 
-        const metricBoxHtml = renderSpecificMetricBox(item);
-        if (metricBoxHtml) {
-          const metricDiv = document.createElement('div');
-          metricDiv.style.marginTop = '8px';
-          metricDiv.innerHTML = metricBoxHtml;
-          div.appendChild(metricDiv);
+        // 對比視窗下方同步顯示專屬數值標記
+        const statsHtml = generateMetricStatsHtml(item);
+        if (statsHtml) {
+          const statsDiv = document.createElement('div');
+          statsDiv.style.marginTop = '8px';
+          statsDiv.innerHTML = statsHtml;
+          div.appendChild(statsDiv);
         }
 
         compareGrid.appendChild(div);
@@ -535,9 +540,12 @@
       compareSection.classList.add('active');
     };
 
+    // 關閉對比視窗
     closeCompareBtn.onclick = () => {
       compareSection.classList.remove('active');
     };
+
+    // --- 圖片放大/縮小/拖曳 (Zoom/Pan Modal) 控制邏輯 ---
 
     function openZoomModal(src, title) {
       currentImageSrc = src;
@@ -571,18 +579,21 @@
       updateTransform();
     }
 
+    // 滾輪縮放
     zoomViewport.addEventListener('wheel', (e) => {
       e.preventDefault();
       const delta = e.deltaY < 0 ? 0.15 : -0.15;
       setScale(currentScale + delta);
     }, { passive: false });
 
+    // 按鈕控制
     zoomInBtn.onclick = () => setScale(currentScale + 0.25);
     zoomOutBtn.onclick = () => setScale(currentScale - 0.25);
     zoomResetBtn.onclick = resetZoom;
     closeZoomBtn.onclick = closeZoomModal;
     zoomDownloadBtn.onclick = () => downloadImage(currentImageSrc, currentImageTitle);
 
+    // 滑鼠拖曳 (Pan)
     zoomViewport.addEventListener('mousedown', (e) => {
       if (e.target.tagName === 'BUTTON') return;
       isDragging = true;
@@ -601,6 +612,7 @@
       isDragging = false;
     });
 
+    // 點擊背景空白處關閉 Modal
     zoomModal.addEventListener('click', (e) => {
       if (e.target === zoomModal || e.target === zoomViewport) {
         closeZoomModal();
