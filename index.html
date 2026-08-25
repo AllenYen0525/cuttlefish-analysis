@@ -11,7 +11,10 @@
 
     /* 頂部導覽列與篩選器 */
     header { background: #ffffff; padding: 16px 24px; border-bottom: 1px solid #e1e4e8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    h1 { font-size: 1.25rem; margin-bottom: 12px; color: #24292e; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    h1 { font-size: 1.25rem; color: #24292e; }
+    .data-counter { font-size: 0.85rem; color: #586069; background: #eaeef2; padding: 4px 10px; border-radius: 12px; font-weight: 500; }
+
     .filter-container { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
     .filter-group { display: flex; flex-direction: column; gap: 4px; }
     .filter-group label { font-size: 0.75rem; font-weight: bold; color: #586069; text-transform: uppercase; }
@@ -34,20 +37,25 @@
     /* 主要內容展示區 */
     main { display: flex; flex: 1; overflow: hidden; }
     .gallery-section { flex: 1; padding: 20px; overflow-y: auto; }
-    .chart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .chart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
     .chart-card { background: white; border: 2px solid #e1e4e8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s; position: relative; }
     .chart-card:hover { border-color: #0969da; }
     .chart-card.selected { border-color: #0969da; background-color: #f0f7ff; }
-    .chart-card img { width: 100%; height: 180px; object-fit: contain; border-radius: 4px; background: #eee; cursor: zoom-in; }
-    .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; }
+    
+    /* 圖片載入容器 */
+    .img-box { width: 100%; height: 180px; background: #eee; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .chart-card img { width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; }
+    
+    .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; display: flex; flex-direction: column; gap: 6px; }
     .tag-badge { display: inline-block; background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin: 2px 2px 2px 0; }
     
-    /* 數值標記樣式 */
-    .metric-stats-box { margin-top: 8px; padding: 6px 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.76rem; }
-    .metric-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
-    .metric-row:last-child { margin-bottom: 0; }
+    /* 專屬專用數值面板 */
+    .metric-panel { margin-top: 4px; padding: 8px 10px; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; font-size: 0.78rem; line-height: 1.4; }
+    .metric-title { font-weight: bold; color: #0969da; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .metric-row { display: flex; justify-content: space-between; margin-top: 2px; }
     .val-sig { color: #cf222e; font-weight: bold; }
-    .val-tag { background: #e0f2fe; color: #0369a1; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
+    .val-ratio { color: #0969da; font-weight: bold; }
+    .val-events { font-size: 0.72rem; color: #586069; }
 
     .card-actions { margin-top: 10px; display: flex; justify-content: flex-end; }
 
@@ -57,107 +65,35 @@
     .compare-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
     .close-btn { background: #cf222e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    /* 高度調節滑桿控制區 */
     .compare-controls { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; background: rgba(255,255,255,0.1); padding: 6px 16px; border-radius: 20px; }
     .compare-controls input[type="range"] { cursor: pointer; }
 
-    /* 縱向單欄佈局與滾動控制 */
-    .compare-grid { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 16px; 
-      flex: 1; 
-      overflow-y: auto; 
-      padding-right: 8px; 
-      --chart-height: 300px;
-    }
-    .compare-item { 
-      background: white; 
-      padding: 12px; 
-      border-radius: 8px; 
-      display: flex; 
-      flex-direction: column; 
-      width: 100%; 
-      max-width: 1000px; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
-      position: relative; 
-    }
-    .compare-item .dl-btn-floating { 
-      position: absolute; 
-      top: 18px; 
-      right: 18px; 
-      z-index: 10; 
-      opacity: 0.8; 
-      transition: opacity 0.2s; 
-    }
-    .compare-item:hover .dl-btn-floating { 
-      opacity: 1; 
-    }
-    .compare-item img { 
-      width: 100%; 
-      height: var(--chart-height, 300px); 
-      object-fit: contain; 
-      cursor: zoom-in; 
-      transition: height 0.15s ease-out; 
-    }
+    .compare-grid { display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 1; overflow-y: auto; padding-right: 8px; --chart-height: 300px; }
+    .compare-item { background: white; padding: 12px; border-radius: 8px; display: flex; flex-direction: column; width: 100%; max-width: 1000px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); position: relative; }
+    .compare-item .dl-btn-floating { position: absolute; top: 18px; right: 18px; z-index: 10; opacity: 0.8; transition: opacity 0.2s; }
+    .compare-item:hover .dl-btn-floating { opacity: 1; }
+    .compare-item img { width: 100%; height: var(--chart-height, 300px); object-fit: contain; cursor: zoom-in; transition: height 0.15s ease-out; }
 
     /* 圖片放大檢視 Modal */
-    .zoom-modal { 
-      display: none; 
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      width: 100vw; 
-      height: 100vh; 
-      background: rgba(0, 0, 0, 0.9); 
-      z-index: 200; 
-      flex-direction: column; 
-    }
+    .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); z-index: 200; flex-direction: column; }
     .zoom-modal.active { display: flex; }
-    .zoom-toolbar { 
-      display: flex; 
-      justify-content: flex-end; 
-      align-items: center; 
-      padding: 12px 24px; 
-      background: rgba(0, 0, 0, 0.5); 
-      color: white; 
-    }
+    .zoom-toolbar { display: flex; justify-content: flex-end; align-items: center; padding: 12px 24px; background: rgba(0, 0, 0, 0.5); color: white; }
     .zoom-controls { display: flex; gap: 8px; align-items: center; }
-    .zoom-btn { 
-      background: #333; 
-      color: white; 
-      border: 1px solid #666; 
-      padding: 6px 12px; 
-      border-radius: 4px; 
-      cursor: pointer; 
-      font-weight: bold; 
-    }
+    .zoom-btn { background: #333; color: white; border: 1px solid #666; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .zoom-btn:hover { background: #555; }
-    .zoom-viewport { 
-      flex: 1; 
-      overflow: hidden; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      position: relative; 
-      cursor: grab; 
-    }
+    .zoom-viewport { flex: 1; overflow: hidden; display: flex; justify-content: center; align-items: center; position: relative; cursor: grab; }
     .zoom-viewport:active { cursor: grabbing; }
-    .zoom-viewport img { 
-      max-width: 90%; 
-      max-height: 90%; 
-      transition: transform 0.05s linear; 
-      transform-origin: center center; 
-      user-select: none; 
-    }
+    .zoom-viewport img { max-width: 90%; max-height: 90%; transition: transform 0.05s linear; transform-origin: center center; user-select: none; }
   </style>
 </head>
 <body>
 
   <!-- 頂部導覽列與篩選區 -->
   <header>
-    <h1>圖表分析儀表板0820</h1>
+    <div class="header-top">
+      <h1>圖表分析儀表板0820</h1>
+      <span id="data-counter" class="data-counter">顯示 0 / 0 筆</span>
+    </div>
     <div class="filter-container">
       <div class="filter-group">
         <label>Part</label>
@@ -198,13 +134,11 @@
   <div id="compare-section" class="compare-section">
     <div class="compare-header">
       <h2>圖表對比 (垂直視窗)</h2>
-
       <div class="compare-controls">
         <label for="height-slider">圖表高度：</label>
         <input type="range" id="height-slider" min="150" max="800" value="300" step="10">
         <span id="height-val">300px</span>
       </div>
-
       <button id="close-compare-btn" class="close-btn">關閉對比</button>
     </div>
     <div id="compare-grid" class="compare-grid"></div>
@@ -231,13 +165,13 @@
     let rawData = [];
     const selectedIds = new Set();
 
-    // DOM 元素
     const chartGrid = document.getElementById('chart-grid');
     const compareBtn = document.getElementById('compare-btn');
     const clearBtn = document.getElementById('clear-btn');
     const compareSection = document.getElementById('compare-section');
     const compareGrid = document.getElementById('compare-grid');
     const closeCompareBtn = document.getElementById('close-compare-btn');
+    const dataCounter = document.getElementById('data-counter');
 
     const heightSlider = document.getElementById('height-slider');
     const heightVal = document.getElementById('height-val');
@@ -252,12 +186,8 @@
     const zoomResetBtn = document.getElementById('zoom-reset-btn');
     const zoomDownloadBtn = document.getElementById('zoom-download-btn');
 
-    let currentScale = 1;
-    let translateX = 0, translateY = 0;
-    let isDragging = false;
-    let startX = 0, startY = 0;
-    let currentImageSrc = '';
-    let currentImageTitle = '';
+    let currentScale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0;
+    let currentImageSrc = '', currentImageTitle = '';
 
     const filters = {
       part: document.getElementById('filter-part'),
@@ -282,7 +212,6 @@
       document.body.removeChild(link);
     }
 
-    // 格式化數值
     const fmt = (v, d = 2) => (v !== null && v !== undefined && !isNaN(v)) ? Number(v).toFixed(d) : '-';
     const fmtP = (p) => {
       if (p === null || p === undefined || isNaN(p)) return '-';
@@ -290,7 +219,36 @@
       return p < 0.001 ? '< 0.001' : Number(p).toFixed(3);
     };
 
-    // 初始化：讀取 data.json，若有 data_QS_AS.json 則非同步合併數值
+    // 自動匹配 data.json 與 data_QS_AS.json 的關聯
+    function findMatchedStats(item, statList) {
+      const fileName = (item.file || '').toLowerCase();
+      const tags = item.tags || {};
+      const subject = (tags.Subject || '').toLowerCase();
+      const dateVal = (tags.Date || '').replace(/[^0-9]/g, '');
+
+      // 1. 檔名或 ID 精準比對
+      for (const s of statList) {
+        if (s.id && s.id === item.id) return s;
+        const sFile = (s.file_image || '').toLowerCase();
+        
+        // 比對日期數字 (例如 25111415)
+        const dateMatch = sFile.match(/25\d{6}|26\d{6}/);
+        if (dateMatch && fileName.includes(dateMatch[0])) {
+          return s;
+        }
+      }
+
+      // 2. 標籤比對 (Subject + Date)
+      for (const s of statList) {
+        const sInd = (s.individual || '').toLowerCase();
+        const sDate = (s.date || '').replace(/[^0-9]/g, '');
+        if (sInd === subject && dateVal && sDate.includes(dateVal)) {
+          return s;
+        }
+      }
+      return null;
+    }
+
     async function init() {
       try {
         const [tagsRes, statsRes] = await Promise.allSettled([
@@ -301,30 +259,17 @@
         const tagList = tagsRes.status === 'fulfilled' ? tagsRes.value : [];
         const statList = statsRes.status === 'fulfilled' ? statsRes.value : [];
 
-        // 建立 stats 索引
-        const statsMap = new Map();
-        statList.forEach(s => {
-          if (s.id) statsMap.set(s.id, s);
-          if (s.file_image) {
-            const cleanName = s.file_image.replace(/^.*[\\\/]/, '').replace('.png', '');
-            statsMap.set(cleanName, s);
-          }
-        });
-
-        rawData = tagList.map((item, idx) => {
-          const fileKey = (item.file || '').replace(/^.*[\\\/]/, '').replace('.png', '');
-          const matched = statsMap.get(item.id) || statsMap.get(fileKey) || null;
-          return {
-            ...item,
-            statsData: matched
-          };
-        });
+        rawData = tagList.map((item, idx) => ({
+          ...item,
+          id: item.id || `chart_${idx + 1}`,
+          matchedStats: findMatchedStats(item, statList)
+        }));
 
         populateFilterOptions();
         renderGallery();
       } catch (err) {
         console.error('無法載入資料:', err);
-        chartGrid.innerHTML = '<p style="color:red;">載入資料失敗，請確認 data.json 檔案路徑。</p>';
+        chartGrid.innerHTML = '<p style="color:red; padding:20px;">載入 data.json 失敗，請確認檔案路徑。</p>';
       }
     }
 
@@ -347,47 +292,46 @@
       });
     }
 
-    // 依據該圖表的 Metric 產生對應數值小標籤
-    function generateMetricStatsHtml(item) {
-      if (!item.statsData || !item.statsData.stats) return '';
-      const s = item.statsData.stats;
-      const currentMetric = item.tags ? (item.tags.Metric || '') : '';
+    // 依據圖片的指標 (Metric) 渲染專屬數值方塊
+    function renderSpecificMetricBox(item) {
+      if (!item.matchedStats || !item.matchedStats.stats) return '';
+      const s = item.matchedStats.stats;
+      const metricTag = (item.tags && item.tags.Metric ? item.tags.Metric : item.file || '').toLowerCase();
       
-      let targetObj = null;
-      let label = '數據指標';
+      let title = '';
+      let target = null;
 
-      if (currentMetric.toLowerCase().includes('speed')) {
-        targetObj = s.speed;
-        label = 'Speed (px/s)';
-      } else if (currentMetric.toLowerCase().includes('std') || currentMetric.toLowerCase().includes('波動')) {
-        targetObj = s.brightness_std;
-        label = 'Brightness SD';
-      } else if (currentMetric.toLowerCase().includes('bright') || currentMetric.toLowerCase().includes('亮度')) {
-        targetObj = s.mean_brightness;
-        label = 'Brightness Mean';
-      } else {
-        // 若 Metric 無法直接比對，預設顯示主要 Brightness 與 Speed 比值
-        return `
-          <div class="metric-stats-box">
-            <div class="metric-row">
-              <span><b>AS/QS 次數:</b> ${item.statsData.n_AS_events ?? '-'} / ${item.statsData.n_QS_events ?? '-'}</span>
-              <span class="val-tag">Ratio: ${fmt(s.mean_brightness?.ratio)}</span>
-            </div>
-          </div>
-        `;
+      if (metricTag.includes('speed') || metricTag.includes('位移') || metricTag.includes('速度')) {
+        title = '位移速度 (Speed px/s)';
+        target = s.speed;
+      } else if (metricTag.includes('std') || metricTag.includes('波動')) {
+        title = '亮度波動 (Brightness SD)';
+        target = s.brightness_std;
+      } else if (metricTag.includes('bright') || metricTag.includes('亮度')) {
+        title = '亮度數值 (Mean Brightness)';
+        target = s.mean_brightness;
       }
 
-      if (!targetObj) return '';
+      if (!target) return '';
+
+      const asVal = target.as_mean !== null && target.as_mean !== undefined ? `${fmt(target.as_mean)} ± ${fmt(target.as_std, 1)}` : '-';
+      const qsVal = target.qs_mean !== null && target.qs_mean !== undefined ? `${fmt(target.qs_mean)} ± ${fmt(target.qs_std, 1)}` : '-';
+      const ratioVal = target.ratio !== null && target.ratio !== undefined ? fmt(target.ratio) : '-';
+      const isSig = target.p_value !== null && target.p_value < 0.05;
 
       return `
-        <div class="metric-stats-box">
-          <div class="metric-row">
-            <span><b>AS:</b> ${fmt(targetObj.as_mean)} ± ${fmt(targetObj.as_std, 1)}</span>
-            <span><b>QS:</b> ${fmt(targetObj.qs_mean)} ± ${fmt(targetObj.qs_std, 1)}</span>
+        <div class="metric-panel">
+          <div class="metric-title">
+            <span>${title}</span>
+            <span class="val-events">AS: ${item.matchedStats.n_AS_events ?? '-'}次 | QS: ${item.matchedStats.n_QS_events ?? '-'}次</span>
           </div>
-          <div class="metric-row" style="margin-top: 3px; border-top: 1px dashed #e2e8f0; padding-top: 3px;">
-            <span class="val-tag">Ratio: ${fmt(targetObj.ratio)}</span>
-            <span class="${targetObj.p_value < 0.05 ? 'val-sig' : ''}">p: ${fmtP(targetObj.p_value)}</span>
+          <div class="metric-row">
+            <span><b>AS:</b> ${asVal}</span>
+            <span><b>QS:</b> ${qsVal}</span>
+          </div>
+          <div class="metric-row" style="margin-top: 3px; border-top: 1px dashed #e1e4e8; padding-top: 3px;">
+            <span>Ratio (AS/QS): <b class="val-ratio">${ratioVal}</b></span>
+            <span>p: <b class="${isSig ? 'val-sig' : ''}">${fmtP(target.p_value)}</b></span>
           </div>
         </div>
       `;
@@ -403,10 +347,15 @@
         });
       });
 
+      dataCounter.textContent = `顯示 ${filteredData.length} / ${rawData.length} 筆`;
+
       filteredData.forEach(item => {
         const card = document.createElement('div');
         card.className = `chart-card ${selectedIds.has(item.id) ? 'selected' : ''}`;
         card.onclick = () => toggleSelect(item.id, card);
+
+        const imgBox = document.createElement('div');
+        imgBox.className = 'img-box';
 
         const img = document.createElement('img');
         img.src = item.file;
@@ -414,27 +363,31 @@
         img.loading = 'lazy';
         img.onclick = (e) => {
           e.stopPropagation();
-          openZoomModal(item.file, item.title);
+          openZoomModal(item.file, item.title || item.id);
         };
+        imgBox.appendChild(img);
 
         const info = document.createElement('div');
         info.className = 'chart-info';
 
+        // 標籤徽章
+        const tagsContainer = document.createElement('div');
         if (item.tags) {
           Object.entries(item.tags).forEach(([k, v]) => {
             const tag = document.createElement('span');
             tag.className = 'tag-badge';
             tag.textContent = `${k}: ${v}`;
-            info.appendChild(tag);
+            tagsContainer.appendChild(tag);
           });
         }
+        info.appendChild(tagsContainer);
 
-        // 插入符合條件的數值標記
-        const statsHtml = generateMetricStatsHtml(item);
-        if (statsHtml) {
-          const statsContainer = document.createElement('div');
-          statsContainer.innerHTML = statsHtml;
-          info.appendChild(statsContainer);
+        // 該圖專屬的數值標記
+        const metricBoxHtml = renderSpecificMetricBox(item);
+        if (metricBoxHtml) {
+          const metricDiv = document.createElement('div');
+          metricDiv.innerHTML = metricBoxHtml;
+          info.appendChild(metricDiv);
         }
 
         const actions = document.createElement('div');
@@ -444,11 +397,11 @@
         dlBtn.textContent = '下載圖片';
         dlBtn.onclick = (e) => {
           e.stopPropagation();
-          downloadImage(item.file, item.title);
+          downloadImage(item.file, item.title || item.id);
         };
         actions.appendChild(dlBtn);
 
-        card.appendChild(img);
+        card.appendChild(imgBox);
         card.appendChild(info);
         card.appendChild(actions);
         chartGrid.appendChild(card);
@@ -475,9 +428,7 @@
 
     clearBtn.onclick = () => {
       selectedIds.clear();
-      document.querySelectorAll('.chart-card.selected').forEach(card => {
-        card.classList.remove('selected');
-      });
+      document.querySelectorAll('.chart-card.selected').forEach(card => card.classList.remove('selected'));
       updateActionBar();
     };
 
@@ -494,24 +445,23 @@
         dlBtn.textContent = '下載圖表';
         dlBtn.onclick = (e) => {
           e.stopPropagation();
-          downloadImage(item.file, item.title);
+          downloadImage(item.file, item.title || item.id);
         };
 
         const img = document.createElement('img');
         img.src = item.file;
         img.alt = item.title || 'chart';
-        img.onclick = () => openZoomModal(item.file, item.title);
+        img.onclick = () => openZoomModal(item.file, item.title || item.id);
 
         div.appendChild(dlBtn);
         div.appendChild(img);
 
-        // 對比視窗同步加入數值標記
-        const statsHtml = generateMetricStatsHtml(item);
-        if (statsHtml) {
-          const statsDiv = document.createElement('div');
-          statsDiv.style.marginTop = '8px';
-          statsDiv.innerHTML = statsHtml;
-          div.appendChild(statsDiv);
+        const metricBoxHtml = renderSpecificMetricBox(item);
+        if (metricBoxHtml) {
+          const metricDiv = document.createElement('div');
+          metricDiv.style.marginTop = '8px';
+          metricDiv.innerHTML = metricBoxHtml;
+          div.appendChild(metricDiv);
         }
 
         compareGrid.appendChild(div);
@@ -520,9 +470,7 @@
       compareSection.classList.add('active');
     };
 
-    closeCompareBtn.onclick = () => {
-      compareSection.classList.remove('active');
-    };
+    closeCompareBtn.onclick = () => compareSection.classList.remove('active');
 
     function openZoomModal(src, title) {
       currentImageSrc = src;
@@ -532,22 +480,15 @@
       zoomModal.classList.add('active');
     }
 
-    function closeZoomModal() {
-      zoomModal.classList.remove('active');
-    }
-
+    function closeZoomModal() { zoomModal.classList.remove('active'); }
     function updateTransform() {
       zoomImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
       zoomLevelText.textContent = `${Math.round(currentScale * 100)}%`;
     }
-
     function resetZoom() {
-      currentScale = 1;
-      translateX = 0;
-      translateY = 0;
+      currentScale = 1; translateX = 0; translateY = 0;
       updateTransform();
     }
-
     function setScale(newScale) {
       currentScale = Math.min(Math.max(newScale, 0.5), 5);
       updateTransform();
@@ -555,8 +496,7 @@
 
     zoomViewport.addEventListener('wheel', (e) => {
       e.preventDefault();
-      const delta = e.deltaY < 0 ? 0.15 : -0.15;
-      setScale(currentScale + delta);
+      setScale(currentScale + (e.deltaY < 0 ? 0.15 : -0.15));
     }, { passive: false });
 
     zoomInBtn.onclick = () => setScale(currentScale + 0.25);
@@ -579,14 +519,9 @@
       updateTransform();
     });
 
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-
+    window.addEventListener('mouseup', () => { isDragging = false; });
     zoomModal.addEventListener('click', (e) => {
-      if (e.target === zoomModal || e.target === zoomViewport) {
-        closeZoomModal();
-      }
+      if (e.target === zoomModal || e.target === zoomViewport) closeZoomModal();
     });
 
     init();
