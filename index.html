@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AS / QS 圖表與數據統計儀表板</title>
+  <title>圖表分析與數據儀表板</title>
   <style>
     /* 全域設定 */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,16 +36,17 @@
     /* 主要內容展示區 */
     main { display: flex; flex: 1; overflow: hidden; }
     .gallery-section { flex: 1; padding: 20px; overflow-y: auto; }
-    .chart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+    .chart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px; }
     .chart-card { background: white; border: 2px solid #e1e4e8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s; position: relative; }
     .chart-card:hover { border-color: #0969da; }
     .chart-card.selected { border-color: #0969da; background-color: #f0f7ff; }
-    .chart-card img { width: 100%; height: 200px; object-fit: contain; border-radius: 4px; background: #1a1a1a; cursor: zoom-in; }
+
+    /* 圖檔容器 */
+    .img-container { width: 100%; height: 200px; background: #f0f2f5; border-radius: 4px; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 1px solid #e1e4e8; }
+    .chart-card img { width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; }
 
     /* 資訊與數值表格 */
     .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-    .card-meta-row { display: flex; justify-content: space-between; align-items: center; }
-    .chart-id { font-weight: bold; color: #0969da; }
     .tags-row { display: flex; flex-wrap: wrap; gap: 4px; }
     .tag-badge { background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
     .status-badge { padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; font-weight: bold; }
@@ -71,7 +72,8 @@
 
     .compare-grid { display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 1; overflow-y: auto; padding-right: 8px; --chart-height: 320px; }
     .compare-item { background: white; padding: 12px; border-radius: 8px; display: flex; flex-direction: column; width: 100%; max-width: 1050px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); position: relative; }
-    .compare-item img { width: 100%; height: var(--chart-height, 320px); object-fit: contain; background: #111; cursor: zoom-in; border-radius: 4px; transition: height 0.15s ease-out; }
+    .compare-item .img-container { height: var(--chart-height, 320px); }
+    .compare-item img { width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; }
 
     /* Zoom Modal */
     .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); z-index: 200; flex-direction: column; }
@@ -89,21 +91,29 @@
 
   <header>
     <div class="header-top">
-      <h1>AS / QS 圖表與數據統計儀表板</h1>
+      <h1>圖表分析與數據儀表板</h1>
       <span id="data-counter" class="data-counter">顯示 0 / 0 筆</span>
     </div>
     <div class="filter-container">
       <div class="filter-group">
-        <label>Individual</label>
-        <select id="filter-individual"><option value="ALL">全部 (ALL)</option></select>
+        <label>Part</label>
+        <select id="filter-part"><option value="ALL">全部 (ALL)</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Metric</label>
+        <select id="filter-metric"><option value="ALL">全部 (ALL)</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Subject</label>
+        <select id="filter-subject"><option value="ALL">全部 (ALL)</option></select>
       </div>
       <div class="filter-group">
         <label>Condition</label>
         <select id="filter-condition"><option value="ALL">全部 (ALL)</option></select>
       </div>
       <div class="filter-group">
-        <label>Status</label>
-        <select id="filter-status"><option value="ALL">全部 (ALL)</option></select>
+        <label>Date</label>
+        <select id="filter-date"><option value="ALL">全部 (ALL)</option></select>
       </div>
 
       <div class="action-bar">
@@ -119,7 +129,6 @@
     </section>
   </main>
 
-  <!-- 全螢幕圖表對比視窗 -->
   <div id="compare-section" class="compare-section">
     <div class="compare-header">
       <h2>圖表對比與數據比較</h2>
@@ -133,7 +142,6 @@
     <div id="compare-grid" class="compare-grid"></div>
   </div>
 
-  <!-- 圖片放大縮小 Modal -->
   <div id="zoom-modal" class="zoom-modal">
     <div class="zoom-toolbar">
       <div class="zoom-controls">
@@ -154,7 +162,6 @@
     let rawData = [];
     const selectedIds = new Set();
 
-    // DOM 元素
     const chartGrid = document.getElementById('chart-grid');
     const compareBtn = document.getElementById('compare-btn');
     const clearBtn = document.getElementById('clear-btn');
@@ -179,18 +186,33 @@
     let currentImageSrc = '', currentImageTitle = '';
 
     const filters = {
-      individual: document.getElementById('filter-individual'),
-      condition: document.getElementById('filter-condition'),
-      status: document.getElementById('filter-status')
+      part: document.getElementById('filter-part'),
+      Metric: document.getElementById('filter-metric'),
+      Subject: document.getElementById('filter-subject'),
+      Condition: document.getElementById('filter-condition'),
+      Date: document.getElementById('filter-date')
     };
 
-    // 格式化輔助函式
     const fmt = (v, d = 2) => (v !== null && v !== undefined && !isNaN(v)) ? Number(v).toFixed(d) : '-';
     const fmtP = (p) => {
       if (p === null || p === undefined || isNaN(p)) return '-';
       if (p === 0) return '0.000';
       return p < 0.001 ? '< 0.001' : Number(p).toFixed(3);
     };
+
+    function handleImgError(img, originalPath) {
+      if (originalPath && originalPath.startsWith('images/')) {
+        const fallback = originalPath.replace('images/', '');
+        img.onerror = () => {
+          img.onerror = null;
+          img.style.display = 'none';
+          if (img.parentElement) {
+            img.parentElement.innerHTML = '<span style="color:#888; font-size:0.8rem;">找不到圖檔：' + fallback + '</span>';
+          }
+        };
+        img.src = fallback;
+      }
+    }
 
     heightSlider.addEventListener('input', (e) => {
       const val = e.target.value;
@@ -207,23 +229,77 @@
       document.body.removeChild(link);
     }
 
+    // 初始化：同時讀取 data.json (標籤/檔案) 與 data_QS_AS.json (數值)
     async function init() {
       try {
-        const response = await fetch('data_QS_AS.json');
-        rawData = await response.json();
+        const [tagsRes, statsRes] = await Promise.allSettled([
+          fetch('data.json').then(r => r.json()),
+          fetch('data_QS_AS.json').then(r => r.json())
+        ]);
+
+        const tagList = tagsRes.status === 'fulfilled' ? tagsRes.value : [];
+        const statList = statsRes.status === 'fulfilled' ? statsRes.value : [];
+
+        // 建立 stats 查詢索引 (以 id 或檔名為 key)
+        const statsMap = new Map();
+        statList.forEach(s => {
+          if (s.id) statsMap.set(s.id, s);
+          if (s.file_image) {
+            const cleanName = s.file_image.replace('images/', '').replace('.png', '');
+            statsMap.set(cleanName, s);
+          }
+        });
+
+        // 合併資料
+        if (tagList.length > 0) {
+          rawData = tagList.map((item, idx) => {
+            const fileKey = (item.file || '').replace('images/', '').replace('.png', '');
+            const matchedStat = statsMap.get(item.id) || statsMap.get(fileKey) || statList[idx] || {};
+            return {
+              id: item.id || `chart_${idx + 1}`,
+              file: item.file || matchedStat.file_image || '',
+              title: item.title || '',
+              tags: item.tags || {},
+              status: matchedStat.status || 'ok',
+              n_AS_events: matchedStat.n_AS_events,
+              n_QS_events: matchedStat.n_QS_events,
+              stats: matchedStat.stats || null
+            };
+          });
+        } else {
+          // 若只有 data_QS_AS.json
+          rawData = statList.map((item, idx) => ({
+            id: item.id || `chart_${idx + 1}`,
+            file: item.file_image || item.file || '',
+            tags: {
+              Subject: item.individual,
+              Condition: item.condition,
+              Date: item.date
+            },
+            status: item.status || 'ok',
+            n_AS_events: item.n_AS_events,
+            n_QS_events: item.n_QS_events,
+            stats: item.stats || null
+          }));
+        }
+
         populateFilterOptions();
         renderGallery();
       } catch (err) {
-        console.error('無法載入 data_QS_AS.json:', err);
-        chartGrid.innerHTML = '<p style="color:red; padding: 20px;">載入 data_QS_AS.json 失敗，請確認檔案路徑是否正確。</p>';
+        console.error('資料載入失敗:', err);
+        chartGrid.innerHTML = '<p style="color:red; padding: 20px;">載入資料失敗，請確認 data.json 與 data_QS_AS.json 是否存在。</p>';
       }
     }
 
     function populateFilterOptions() {
-      ['individual', 'condition', 'status'].forEach(key => {
+      const keys = ['part', 'Metric', 'Subject', 'Condition', 'Date'];
+      keys.forEach(key => {
+        if (!filters[key]) return;
         const options = new Set();
         rawData.forEach(item => {
-          if (item[key]) options.add(item[key]);
+          if (item.tags && item.tags[key]) {
+            options.add(item.tags[key]);
+          }
         });
         options.forEach(val => {
           const opt = document.createElement('option');
@@ -236,7 +312,7 @@
     }
 
     function renderStatsTable(stats) {
-      if (!stats) return '<p style="color:#888; font-size:0.75rem;">無統計數據</p>';
+      if (!stats) return '<p style="color:#888; font-size:0.75rem; margin-top:4px;">無統計數據</p>';
       const mb = stats.mean_brightness || {};
       const sp = stats.speed || {};
       const bs = stats.brightness_std || {};
@@ -244,8 +320,8 @@
       const renderRow = (label, obj) => `
         <tr>
           <td><b>${label}</b></td>
-          <td>${obj.as_mean !== null ? `${fmt(obj.as_mean)} ± ${fmt(obj.as_std, 1)}` : '-'}</td>
-          <td>${obj.qs_mean !== null ? `${fmt(obj.qs_mean)} ± ${fmt(obj.qs_std, 1)}` : '-'}</td>
+          <td>${obj.as_mean !== null && obj.as_mean !== undefined ? `${fmt(obj.as_mean)} ± ${fmt(obj.as_std, 1)}` : '-'}</td>
+          <td>${obj.qs_mean !== null && obj.qs_mean !== undefined ? `${fmt(obj.qs_mean)} ± ${fmt(obj.qs_std, 1)}` : '-'}</td>
           <td class="val-highlight">${fmt(obj.ratio)}</td>
           <td class="${obj.p_value !== null && obj.p_value < 0.05 ? 'val-sig' : ''}">${fmtP(obj.p_value)}</td>
         </tr>
@@ -282,41 +358,52 @@
       const filteredData = rawData.filter(item => {
         return Object.keys(filters).every(key => {
           const val = filters[key].value;
-          return val === 'ALL' || item[key] === val;
+          return val === 'ALL' || (item.tags && item.tags[key] === val);
         });
       });
 
       dataCounter.textContent = `顯示 ${filteredData.length} / ${rawData.length} 筆`;
 
-      filteredData.forEach((item, idx) => {
+      filteredData.forEach(item => {
         const card = document.createElement('div');
         card.className = `chart-card ${selectedIds.has(item.id) ? 'selected' : ''}`;
         card.onclick = () => toggleSelect(item.id, card);
 
+        const imgContainer = document.createElement('div');
+        imgContainer.className = 'img-container';
+
         const img = document.createElement('img');
-        img.src = item.file_image;
+        img.src = item.file;
         img.alt = item.id;
         img.loading = 'lazy';
+        img.onerror = () => handleImgError(img, item.file);
         img.onclick = (e) => {
           e.stopPropagation();
-          openZoomModal(item.file_image, item.id);
+          openZoomModal(item.file, item.id);
         };
+        imgContainer.appendChild(img);
 
         const info = document.createElement('div');
         info.className = 'chart-info';
+
+        let tagsHtml = '';
+        if (item.tags) {
+          Object.entries(item.tags).forEach(([k, v]) => {
+            tagsHtml += `<span class="tag-badge"><b>${k}:</b> ${v}</span>`;
+          });
+        }
+
+        const eventsText = (item.n_AS_events !== undefined && item.n_QS_events !== undefined)
+          ? `<div style="font-size: 0.78rem; color: #586069;">AS: <b>${item.n_AS_events}</b> 次 | QS: <b>${item.n_QS_events}</b> 次</div>`
+          : '';
+
         info.innerHTML = `
-          <div class="card-meta-row">
-            <span class="chart-id">#${idx + 1} (${item.id})</span>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold; color: #0969da;">${item.id}</span>
             <span class="status-badge ${getStatusClass(item.status)}">${item.status}</span>
           </div>
-          <div class="tags-row">
-            <span class="tag-badge"><b>個體:</b> ${item.individual}</span>
-            <span class="tag-badge"><b>條件:</b> ${item.condition}</span>
-            <span class="tag-badge"><b>日期:</b> ${item.date}</span>
-          </div>
-          <div style="font-size: 0.78rem; color: #586069;">
-            AS: <b>${item.n_AS_events ?? 0}</b> 次 | QS: <b>${item.n_QS_events ?? 0}</b> 次
-          </div>
+          <div class="tags-row">${tagsHtml}</div>
+          ${eventsText}
           ${renderStatsTable(item.stats)}
         `;
 
@@ -327,11 +414,11 @@
         dlBtn.textContent = '下載圖表';
         dlBtn.onclick = (e) => {
           e.stopPropagation();
-          downloadImage(item.file_image, item.id);
+          downloadImage(item.file, item.id);
         };
         actions.appendChild(dlBtn);
 
-        card.appendChild(img);
+        card.appendChild(imgContainer);
         card.appendChild(info);
         card.appendChild(actions);
         chartGrid.appendChild(card);
@@ -370,25 +457,36 @@
         const div = document.createElement('div');
         div.className = 'compare-item';
 
+        const imgContainer = document.createElement('div');
+        imgContainer.className = 'img-container';
+
         const img = document.createElement('img');
-        img.src = item.file_image;
+        img.src = item.file;
         img.alt = item.id;
-        img.onclick = () => openZoomModal(item.file_image, item.id);
+        img.onerror = () => handleImgError(img, item.file);
+        img.onclick = () => openZoomModal(item.file, item.id);
+        imgContainer.appendChild(img);
 
         const content = document.createElement('div');
         content.style.marginTop = '10px';
+
+        let tagsHtml = '';
+        if (item.tags) {
+          Object.entries(item.tags).forEach(([k, v]) => {
+            tagsHtml += `<span class="tag-badge"><b>${k}:</b> ${v}</span>`;
+          });
+        }
+
         content.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <b>#${index + 1} - ${item.individual} (${item.condition}) - ${item.date}</b>
+            <b>#${index + 1} - ${item.id}</b>
             <span class="status-badge ${getStatusClass(item.status)}">${item.status}</span>
           </div>
-          <div style="font-size: 0.8rem; color: #586069; margin-bottom: 6px;">
-            AS 事件: <b>${item.n_AS_events ?? 0}</b> | QS 事件: <b>${item.n_QS_events ?? 0}</b>
-          </div>
+          <div class="tags-row" style="margin-bottom: 6px;">${tagsHtml}</div>
           ${renderStatsTable(item.stats)}
         `;
 
-        div.appendChild(img);
+        div.appendChild(imgContainer);
         div.appendChild(content);
         compareGrid.appendChild(div);
       });
