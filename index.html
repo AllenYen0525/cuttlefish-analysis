@@ -11,10 +11,7 @@
 
     /* 頂部導覽列與篩選器 */
     header { background: #ffffff; padding: 16px 24px; border-bottom: 1px solid #e1e4e8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    h1 { font-size: 1.25rem; color: #24292e; }
-    .data-counter { font-size: 0.85rem; color: #586069; background: #eaeef2; padding: 4px 10px; border-radius: 12px; font-weight: 500; }
-
+    h1 { font-size: 1.25rem; margin-bottom: 12px; color: #24292e; }
     .filter-container { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
     .filter-group { display: flex; flex-direction: column; gap: 4px; }
     .filter-group label { font-size: 0.75rem; font-weight: bold; color: #586069; text-transform: uppercase; }
@@ -37,24 +34,20 @@
     /* 主要內容展示區 */
     main { display: flex; flex: 1; overflow: hidden; }
     .gallery-section { flex: 1; padding: 20px; overflow-y: auto; }
-    .chart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .chart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
     .chart-card { background: white; border: 2px solid #e1e4e8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s; position: relative; }
     .chart-card:hover { border-color: #0969da; }
     .chart-card.selected { border-color: #0969da; background-color: #f0f7ff; }
-    
-    /* 圖片載入容器 */
-    .img-box { width: 100%; height: 180px; background: #eee; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-    .chart-card img { width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; }
-    
+    .chart-card img { width: 100%; height: 180px; object-fit: contain; border-radius: 4px; background: #eee; cursor: zoom-in; }
     .chart-info { margin-top: 10px; font-size: 0.85rem; flex: 1; display: flex; flex-direction: column; gap: 6px; }
     .tag-badge { display: inline-block; background: #eef1f5; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin: 2px 2px 2px 0; }
     
-    /* 專屬專用數值面板 */
-    .metric-panel { margin-top: 4px; padding: 8px 10px; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; font-size: 0.78rem; line-height: 1.4; }
-    .metric-title { font-weight: bold; color: #0969da; margin-bottom: 4px; display: flex; justify-content: space-between; }
-    .metric-row { display: flex; justify-content: space-between; margin-top: 2px; }
+    /* 專屬數值標記面板 */
+    .metric-stats-box { margin-top: 4px; padding: 6px 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.76rem; }
+    .metric-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+    .metric-row:last-child { margin-bottom: 0; }
     .val-sig { color: #cf222e; font-weight: bold; }
-    .val-ratio { color: #0969da; font-weight: bold; }
+    .val-tag { background: #e0f2fe; color: #0369a1; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
     .val-events { font-size: 0.72rem; color: #586069; }
 
     .card-actions { margin-top: 10px; display: flex; justify-content: flex-end; }
@@ -65,35 +58,107 @@
     .compare-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
     .close-btn { background: #cf222e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
+    /* 高度調節滑桿控制區 */
     .compare-controls { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; background: rgba(255,255,255,0.1); padding: 6px 16px; border-radius: 20px; }
     .compare-controls input[type="range"] { cursor: pointer; }
 
-    .compare-grid { display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 1; overflow-y: auto; padding-right: 8px; --chart-height: 300px; }
-    .compare-item { background: white; padding: 12px; border-radius: 8px; display: flex; flex-direction: column; width: 100%; max-width: 1000px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); position: relative; }
-    .compare-item .dl-btn-floating { position: absolute; top: 18px; right: 18px; z-index: 10; opacity: 0.8; transition: opacity 0.2s; }
-    .compare-item:hover .dl-btn-floating { opacity: 1; }
-    .compare-item img { width: 100%; height: var(--chart-height, 300px); object-fit: contain; cursor: zoom-in; transition: height 0.15s ease-out; }
+    /* 縱向單欄佈局與滾動控制 */
+    .compare-grid { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 16px; 
+      flex: 1; 
+      overflow-y: auto; 
+      padding-right: 8px; 
+      --chart-height: 300px;
+    }
+    .compare-item { 
+      background: white; 
+      padding: 12px; 
+      border-radius: 8px; 
+      display: flex; 
+      flex-direction: column; 
+      width: 100%; 
+      max-width: 1000px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+      position: relative; 
+    }
+    .compare-item .dl-btn-floating { 
+      position: absolute; 
+      top: 18px; 
+      right: 18px; 
+      z-index: 10; 
+      opacity: 0.8; 
+      transition: opacity 0.2s; 
+    }
+    .compare-item:hover .dl-btn-floating { 
+      opacity: 1; 
+    }
+    .compare-item img { 
+      width: 100%; 
+      height: var(--chart-height, 300px); 
+      object-fit: contain; 
+      cursor: zoom-in; 
+      transition: height 0.15s ease-out; 
+    }
 
-    /* 圖片放大檢視 Modal */
-    .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); z-index: 200; flex-direction: column; }
+    /* 圖片放大檢視 Modal (Zoom Lightbox) */
+    .zoom-modal { 
+      display: none; 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh; 
+      background: rgba(0, 0, 0, 0.9); 
+      z-index: 200; 
+      flex-direction: column; 
+    }
     .zoom-modal.active { display: flex; }
-    .zoom-toolbar { display: flex; justify-content: flex-end; align-items: center; padding: 12px 24px; background: rgba(0, 0, 0, 0.5); color: white; }
+    .zoom-toolbar { 
+      display: flex; 
+      justify-content: flex-end; 
+      align-items: center; 
+      padding: 12px 24px; 
+      background: rgba(0, 0, 0, 0.5); 
+      color: white; 
+    }
     .zoom-controls { display: flex; gap: 8px; align-items: center; }
-    .zoom-btn { background: #333; color: white; border: 1px solid #666; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .zoom-btn { 
+      background: #333; 
+      color: white; 
+      border: 1px solid #666; 
+      padding: 6px 12px; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      font-weight: bold; 
+    }
     .zoom-btn:hover { background: #555; }
-    .zoom-viewport { flex: 1; overflow: hidden; display: flex; justify-content: center; align-items: center; position: relative; cursor: grab; }
+    .zoom-viewport { 
+      flex: 1; 
+      overflow: hidden; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      position: relative; 
+      cursor: grab; 
+    }
     .zoom-viewport:active { cursor: grabbing; }
-    .zoom-viewport img { max-width: 90%; max-height: 90%; transition: transform 0.05s linear; transform-origin: center center; user-select: none; }
+    .zoom-viewport img { 
+      max-width: 90%; 
+      max-height: 90%; 
+      transition: transform 0.05s linear; 
+      transform-origin: center center; 
+      user-select: none; 
+    }
   </style>
 </head>
 <body>
 
   <!-- 頂部導覽列與篩選區 -->
   <header>
-    <div class="header-top">
-      <h1>圖表分析儀表板0820</h1>
-      <span id="data-counter" class="data-counter">顯示 0 / 0 筆</span>
-    </div>
+    <h1>圖表分析儀表板0820</h1>
     <div class="filter-container">
       <div class="filter-group">
         <label>Part</label>
@@ -117,6 +182,7 @@
       </div>
 
       <div class="action-bar">
+        <!-- 一鍵取消選取按鈕 -->
         <button id="clear-btn" class="btn btn-danger" disabled>清除選取</button>
         <button id="compare-btn" class="btn" disabled>對比選取圖表 (0)</button>
       </div>
@@ -134,11 +200,14 @@
   <div id="compare-section" class="compare-section">
     <div class="compare-header">
       <h2>圖表對比 (垂直視窗)</h2>
+
+      <!-- 高度調節器 -->
       <div class="compare-controls">
         <label for="height-slider">圖表高度：</label>
         <input type="range" id="height-slider" min="150" max="800" value="300" step="10">
         <span id="height-val">300px</span>
       </div>
+
       <button id="close-compare-btn" class="close-btn">關閉對比</button>
     </div>
     <div id="compare-grid" class="compare-grid"></div>
@@ -165,17 +234,19 @@
     let rawData = [];
     const selectedIds = new Set();
 
+    // DOM 元素
     const chartGrid = document.getElementById('chart-grid');
     const compareBtn = document.getElementById('compare-btn');
     const clearBtn = document.getElementById('clear-btn');
     const compareSection = document.getElementById('compare-section');
     const compareGrid = document.getElementById('compare-grid');
     const closeCompareBtn = document.getElementById('close-compare-btn');
-    const dataCounter = document.getElementById('data-counter');
 
+    // 對比高度 Slider 元素
     const heightSlider = document.getElementById('height-slider');
     const heightVal = document.getElementById('height-val');
 
+    // Zoom Modal 元素
     const zoomModal = document.getElementById('zoom-modal');
     const zoomImg = document.getElementById('zoom-img');
     const zoomLevelText = document.getElementById('zoom-level');
@@ -186,8 +257,14 @@
     const zoomResetBtn = document.getElementById('zoom-reset-btn');
     const zoomDownloadBtn = document.getElementById('zoom-download-btn');
 
-    let currentScale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0;
-    let currentImageSrc = '', currentImageTitle = '';
+    // Zoom & Drag 狀態管理
+    let currentScale = 1;
+    let translateX = 0;
+    let translateY = 0;
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let currentImageSrc = '';
+    let currentImageTitle = '';
 
     const filters = {
       part: document.getElementById('filter-part'),
@@ -197,12 +274,14 @@
       Date: document.getElementById('filter-date')
     };
 
+    // 高度 Slider 事件監聽
     heightSlider.addEventListener('input', (e) => {
       const val = e.target.value;
       heightVal.textContent = `${val}px`;
       compareGrid.style.setProperty('--chart-height', `${val}px`);
     });
 
+    // 下載圖片通用函式
     function downloadImage(url, title) {
       const link = document.createElement('a');
       link.href = url;
@@ -219,36 +298,35 @@
       return p < 0.001 ? '< 0.001' : Number(p).toFixed(3);
     };
 
-    // 自動匹配 data.json 與 data_QS_AS.json 的關聯
+    // 自動匹配 data.json 的個別圖檔與 data_QS_AS.json 的統計數據
     function findMatchedStats(item, statList) {
-      const fileName = (item.file || '').toLowerCase();
       const tags = item.tags || {};
-      const subject = (tags.Subject || '').toLowerCase();
+      const subject = (tags.Subject || '').toUpperCase();
       const dateVal = (tags.Date || '').replace(/[^0-9]/g, '');
+      const fileStr = (item.file || item.id || '').toLowerCase();
 
-      // 1. 檔名或 ID 精準比對
       for (const s of statList) {
-        if (s.id && s.id === item.id) return s;
+        const sInd = (s.individual || '').toUpperCase();
         const sFile = (s.file_image || '').toLowerCase();
         
-        // 比對日期數字 (例如 25111415)
+        // 1. 檔名中的 8 位數日期匹配 (如 25082526)
         const dateMatch = sFile.match(/25\d{6}|26\d{6}/);
-        if (dateMatch && fileName.includes(dateMatch[0])) {
-          return s;
+        if (dateMatch && (dateVal.includes(dateMatch[0]) || fileStr.includes(dateMatch[0]))) {
+          if (!subject || sInd === subject) return s;
         }
-      }
 
-      // 2. 標籤比對 (Subject + Date)
-      for (const s of statList) {
-        const sInd = (s.individual || '').toLowerCase();
-        const sDate = (s.date || '').replace(/[^0-9]/g, '');
-        if (sInd === subject && dateVal && sDate.includes(dateVal)) {
-          return s;
+        // 2. 日期字串比對 (如 2025-08-25 ~ 2025-08-26 轉為 25082526)
+        if (s.date && dateVal) {
+          const sDateClean = s.date.replace(/[^0-9]/g, '');
+          if (sDateClean.includes(dateVal) && (!subject || sInd === subject)) {
+            return s;
+          }
         }
       }
       return null;
     }
 
+    // 初始化：讀取 data.json，並從 data_QS_AS.json 同步統計指標
     async function init() {
       try {
         const [tagsRes, statsRes] = await Promise.allSettled([
@@ -268,11 +346,12 @@
         populateFilterOptions();
         renderGallery();
       } catch (err) {
-        console.error('無法載入資料:', err);
-        chartGrid.innerHTML = '<p style="color:red; padding:20px;">載入 data.json 失敗，請確認檔案路徑。</p>';
+        console.error('無法載入 data.json:', err);
+        chartGrid.innerHTML = '<p style="color:red; padding: 20px;">載入 data.json 失敗，請確認檔案路徑是否正確。</p>';
       }
     }
 
+    // 動態生成選單選項
     function populateFilterOptions() {
       const keys = ['part', 'Metric', 'Subject', 'Condition', 'Date'];
       keys.forEach(key => {
@@ -292,14 +371,14 @@
       });
     }
 
-    // 依據圖片的指標 (Metric) 渲染專屬數值方塊
+    // 依據該張圖的 Metric 單獨渲染對應數值 (亮度圖顯示亮度、位移圖顯示速度、波動圖顯示標準差)
     function renderSpecificMetricBox(item) {
       if (!item.matchedStats || !item.matchedStats.stats) return '';
       const s = item.matchedStats.stats;
       const metricTag = (item.tags && item.tags.Metric ? item.tags.Metric : item.file || '').toLowerCase();
       
-      let title = '';
       let target = null;
+      let title = '';
 
       if (metricTag.includes('speed') || metricTag.includes('位移') || metricTag.includes('速度')) {
         title = '位移速度 (Speed px/s)';
@@ -307,8 +386,8 @@
       } else if (metricTag.includes('std') || metricTag.includes('波動')) {
         title = '亮度波動 (Brightness SD)';
         target = s.brightness_std;
-      } else if (metricTag.includes('bright') || metricTag.includes('亮度')) {
-        title = '亮度數值 (Mean Brightness)';
+      } else if (metricTag.includes('mean_brightness') || metricTag.includes('brightness_diff') || metricTag.includes('bright') || metricTag.includes('亮度')) {
+        title = '亮度 (Mean Brightness)';
         target = s.mean_brightness;
       }
 
@@ -320,23 +399,24 @@
       const isSig = target.p_value !== null && target.p_value < 0.05;
 
       return `
-        <div class="metric-panel">
-          <div class="metric-title">
-            <span>${title}</span>
+        <div class="metric-stats-box">
+          <div class="metric-row">
+            <span><b>${title}</b></span>
             <span class="val-events">AS: ${item.matchedStats.n_AS_events ?? '-'}次 | QS: ${item.matchedStats.n_QS_events ?? '-'}次</span>
           </div>
           <div class="metric-row">
             <span><b>AS:</b> ${asVal}</span>
             <span><b>QS:</b> ${qsVal}</span>
           </div>
-          <div class="metric-row" style="margin-top: 3px; border-top: 1px dashed #e1e4e8; padding-top: 3px;">
-            <span>Ratio (AS/QS): <b class="val-ratio">${ratioVal}</b></span>
-            <span>p: <b class="${isSig ? 'val-sig' : ''}">${fmtP(target.p_value)}</b></span>
+          <div class="metric-row" style="margin-top: 3px; border-top: 1px dashed #e2e8f0; padding-top: 3px;">
+            <span class="val-tag">Ratio: ${ratioVal}</span>
+            <span class="${isSig ? 'val-sig' : ''}">p: ${fmtP(target.p_value)}</span>
           </div>
         </div>
       `;
     }
 
+    // 渲染圖表清單
     function renderGallery() {
       chartGrid.innerHTML = '';
 
@@ -347,25 +427,24 @@
         });
       });
 
-      dataCounter.textContent = `顯示 ${filteredData.length} / ${rawData.length} 筆`;
-
       filteredData.forEach(item => {
         const card = document.createElement('div');
         card.className = `chart-card ${selectedIds.has(item.id) ? 'selected' : ''}`;
-        card.onclick = () => toggleSelect(item.id, card);
-
-        const imgBox = document.createElement('div');
-        imgBox.className = 'img-box';
+        
+        // 點擊卡片空白或內文切換選取狀態
+        card.onclick = () => {
+          toggleSelect(item.id, card);
+        };
 
         const img = document.createElement('img');
         img.src = item.file;
         img.alt = item.title || 'chart';
         img.loading = 'lazy';
+        // 點擊圖片本體開啟放大 Lightbox
         img.onclick = (e) => {
           e.stopPropagation();
-          openZoomModal(item.file, item.title || item.id);
+          openZoomModal(item.file, item.title);
         };
-        imgBox.appendChild(img);
 
         const info = document.createElement('div');
         info.className = 'chart-info';
@@ -382,7 +461,7 @@
         }
         info.appendChild(tagsContainer);
 
-        // 該圖專屬的數值標記
+        // 插入專屬數值標記
         const metricBoxHtml = renderSpecificMetricBox(item);
         if (metricBoxHtml) {
           const metricDiv = document.createElement('div');
@@ -390,6 +469,7 @@
           info.appendChild(metricDiv);
         }
 
+        // 下載按鈕
         const actions = document.createElement('div');
         actions.className = 'card-actions';
         const dlBtn = document.createElement('button');
@@ -397,17 +477,18 @@
         dlBtn.textContent = '下載圖片';
         dlBtn.onclick = (e) => {
           e.stopPropagation();
-          downloadImage(item.file, item.title || item.id);
+          downloadImage(item.file, item.title);
         };
         actions.appendChild(dlBtn);
 
-        card.appendChild(imgBox);
+        card.appendChild(img);
         card.appendChild(info);
         card.appendChild(actions);
         chartGrid.appendChild(card);
       });
     }
 
+    // 切換選取狀態
     function toggleSelect(id, cardElement) {
       if (selectedIds.has(id)) {
         selectedIds.delete(id);
@@ -419,6 +500,7 @@
       updateActionBar();
     }
 
+    // 更新操作按鈕狀態 (對比/清除選取)
     function updateActionBar() {
       const count = selectedIds.size;
       compareBtn.textContent = `對比選取圖表 (${count})`;
@@ -426,12 +508,16 @@
       clearBtn.disabled = count === 0;
     }
 
+    // 一鍵取消所有選取
     clearBtn.onclick = () => {
       selectedIds.clear();
-      document.querySelectorAll('.chart-card.selected').forEach(card => card.classList.remove('selected'));
+      document.querySelectorAll('.chart-card.selected').forEach(card => {
+        card.classList.remove('selected');
+      });
       updateActionBar();
     };
 
+    // 開啟對比視窗
     compareBtn.onclick = () => {
       compareGrid.innerHTML = '';
       const selectedItems = rawData.filter(item => selectedIds.has(item.id));
@@ -440,22 +526,24 @@
         const div = document.createElement('div');
         div.className = 'compare-item';
 
+        // 浮動下載按鈕
         const dlBtn = document.createElement('button');
         dlBtn.className = 'btn btn-secondary btn-sm dl-btn-floating';
         dlBtn.textContent = '下載圖表';
         dlBtn.onclick = (e) => {
           e.stopPropagation();
-          downloadImage(item.file, item.title || item.id);
+          downloadImage(item.file, item.title);
         };
 
         const img = document.createElement('img');
         img.src = item.file;
         img.alt = item.title || 'chart';
-        img.onclick = () => openZoomModal(item.file, item.title || item.id);
+        img.onclick = () => openZoomModal(item.file, item.title);
 
         div.appendChild(dlBtn);
         div.appendChild(img);
 
+        // 對比視窗下方同步加上專屬數值標記
         const metricBoxHtml = renderSpecificMetricBox(item);
         if (metricBoxHtml) {
           const metricDiv = document.createElement('div');
@@ -470,7 +558,12 @@
       compareSection.classList.add('active');
     };
 
-    closeCompareBtn.onclick = () => compareSection.classList.remove('active');
+    // 關閉對比視窗
+    closeCompareBtn.onclick = () => {
+      compareSection.classList.remove('active');
+    };
+
+    // --- 圖片放大/縮小/拖曳 (Zoom/Pan Modal) 控制邏輯 ---
 
     function openZoomModal(src, title) {
       currentImageSrc = src;
@@ -480,31 +573,45 @@
       zoomModal.classList.add('active');
     }
 
-    function closeZoomModal() { zoomModal.classList.remove('active'); }
+    function closeZoomModal() {
+      zoomModal.classList.remove('active');
+    }
+
     function updateTransform() {
       zoomImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
       zoomLevelText.textContent = `${Math.round(currentScale * 100)}%`;
     }
+
     function resetZoom() {
-      currentScale = 1; translateX = 0; translateY = 0;
-      updateTransform();
-    }
-    function setScale(newScale) {
-      currentScale = Math.min(Math.max(newScale, 0.5), 5);
+      currentScale = 1;
+      translateX = 0;
+      translateY = 0;
       updateTransform();
     }
 
+    function setScale(newScale) {
+      const minScale = 0.5;
+      const maxScale = 5;
+      newScale = Math.min(Math.max(newScale, minScale), maxScale);
+      currentScale = newScale;
+      updateTransform();
+    }
+
+    // 滾輪縮放
     zoomViewport.addEventListener('wheel', (e) => {
       e.preventDefault();
-      setScale(currentScale + (e.deltaY < 0 ? 0.15 : -0.15));
+      const delta = e.deltaY < 0 ? 0.15 : -0.15;
+      setScale(currentScale + delta);
     }, { passive: false });
 
+    // 按鈕控制
     zoomInBtn.onclick = () => setScale(currentScale + 0.25);
     zoomOutBtn.onclick = () => setScale(currentScale - 0.25);
     zoomResetBtn.onclick = resetZoom;
     closeZoomBtn.onclick = closeZoomModal;
     zoomDownloadBtn.onclick = () => downloadImage(currentImageSrc, currentImageTitle);
 
+    // 滑鼠拖曳 (Pan)
     zoomViewport.addEventListener('mousedown', (e) => {
       if (e.target.tagName === 'BUTTON') return;
       isDragging = true;
@@ -519,9 +626,15 @@
       updateTransform();
     });
 
-    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    // 點擊背景空白處關閉 Modal
     zoomModal.addEventListener('click', (e) => {
-      if (e.target === zoomModal || e.target === zoomViewport) closeZoomModal();
+      if (e.target === zoomModal || e.target === zoomViewport) {
+        closeZoomModal();
+      }
     });
 
     init();
